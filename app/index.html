@@ -3,11 +3,11 @@
   <link rel="stylesheet" href="dist/bootstrap.min.css">
   <script src="dist/bundle.js"></script>
 
+
   <title>GoodCoin POC</title>
 </head>
 <body>
 
-  <h1>Goodcoin POC</h1>
   <!-- METAMASK NOT INSTALLED  -->
 
   <div class="container" id="metamask-install" style="display:none">
@@ -46,23 +46,33 @@
 
   <!-- CONTENT  -->
 
-  <div class="container" id="main-content" style="display:none">
+  <div class="container col-xs-1 text-center" id="main-content" style="display:none">
 
-    <p>You have <span id="token_count"></span> GCT tokens</p>
+    <h1>Goodcoin POC</h1>
 
-    <p>You are entitled to claim <span id="token_entitlement"></span> GCT tokens</p>
+    <p>You are logged in as:
+    <p class="text-muted"> <span id="eth_address"></span></p>
+    <br>
 
+    <p>You have <b><span id="token_count" class="text-success"></span></b> GTC tokens</p>
 
-    <div class="form-group form-inline">
+    <p>You are entitled to claim <b><span id="token_entitlement" class="text-success"></span></b> GTC tokens</p>
+
+    <div class="container">
+      <button class="update btn btn-primary">Update Stats</button>
+    </div>
+    <br>
+    <div class="container">
       <button class="claim btn btn-success">Claim Tokens</button>
-      <p>Last claim date: </p>
     </div>
 
-    <div class="form-group form-inline">
-      <button class="balance btn btn-success">Update Balance</button>
-    </div>
 
   </div>
+
+
+Add instructions for these tokens to show up in metamask. - link to readme?
+
+
 
   </body>
 </html>

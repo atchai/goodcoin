@@ -1,8 +1,12 @@
+// Expects web3 to be v.0.2
+
 import $ from 'jquery';
 var Web3 = require('web3')
 
 let contract_address = undefined
 let network_id = undefined
+let owner_account = undefined
+let test_accounts = undefined
 
 // production
 if (window.location.hostname == 'goodcoin.atchai.com') {
@@ -13,10 +17,17 @@ if (window.location.hostname == 'goodcoin.atchai.com') {
 else {
   contract_address = '0x345ca3e014aaf5dca488057592ee47305d9b3e10';  //dev
   network_id = 5777 // ganache - ethereum network ID
+  owner_account = '0x345ca3e014aaf5dca488057592ee47305d9b3e10';
+  test_accounts = [ '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
+                    '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
+                    '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
+                    '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
+                    '0x345ca3e014aaf5dca488057592ee47305d9b3e10'];
 }
 
 const abi = require('./abi.js');
-const price = web3.toWei(0.1, 'ether');
+
+
 
 // Check for Metamask and show/hide appropriate warnings.
 window.addEventListener('load', function() {
@@ -76,6 +87,8 @@ function startApp(web3js) {
   //console.log('contract = ')
   console.log(web3js)
   console.log(contract)
+  console.log('test')
+
 
   web3.eth.getTransactionReceiptMined = function getTransactionReceiptMined(txHash, interval) {
       const self = this;
@@ -103,34 +116,56 @@ function startApp(web3js) {
       }
   };
 
-  let updateBalance = function() {
-    contract.balanceOf(web3js.eth.accounts[0],
+  let getBalance = function(account, callback) {
+    contract.balanceOf(account,
       function (err, res) {
         if (err) {
           return console.error(err);;
         }
         else {
-          console.log('in updatebalance = ' + res.c[0])
-          $('#token_count').text(res.c[0]);
+          callback(res.c[0]);
         }
     });
   }
+
+  let updateBalance = function() {
+    getBalance(web3js.eth.accounts[0], function(balance) {
+      console.log('in updatebalance = ' + balance)
+      $('#token_count').text(balance);
+    })
+  }
+
 
   let updateEntitlement = function() {
-    contract.checkEntitlement(web3js.eth.accounts[0],
+    contract.last_claimed.call(web3js.eth.accounts[0],
       function (err, res) {
         if (err) {
           return console.error(err);;
         }
         else {
-          console.log(res)
-          $('#token_entitlement').text(res.c[0]);
+          let last_claimed = res.c[0];
+          console.log('in updateentitlement, last claimed = ' + last_claimed);
+
+          contract.MINTING_COEFFICIENT.call(web3js.eth.accounts[0],
+            function (err, res) {
+              if (err) {
+                return console.error(err);;
+              }
+              else {
+                let minting_coefficient = res.c[0]
+                let entitlement = Math.round(minting_coefficient * ((Date.now() / 1000) - last_claimed));
+                console.log('in updateentitlement = ' + entitlement);
+                $('#token_entitlement').text(entitlement);
+              }
+          });
+
         }
     });
   }
-
-  $('.balance').on('click', function () {
+  
+  $('.update').on('click', function () {
     updateBalance();
+    updateEntitlement();
   });
 
   $('.claim').on('click', function () {
@@ -141,11 +176,15 @@ function startApp(web3js) {
         console.log(err, transactionHash);
         return web3.eth.getTransactionReceiptMined(transactionHash, 5000).then(function (receipt) {
           // wait 3 seconds to update balance as it will not have updated if we call immediately
-          setTimeout(function(){ updateBalance(); }, 3000);
+          setTimeout(function(){
+            updateBalance();
+            updateEntitlement();
+          }, 5000);
         });
     });
   });
 
   updateBalance();
   updateEntitlement();
+  $('#eth_address').text(web3js.eth.accounts[0]);
 }
