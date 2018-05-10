@@ -128,15 +128,16 @@ function startApp(web3js) {
     });
   }
 
-  let updateBalance = function() {
+  let updateMyBalance = function() {
     getBalance(web3js.eth.accounts[0], function(balance) {
-      console.log('in updatebalance = ' + balance)
+      console.log('in updateMyBalance = ' + balance)
       $('#token_count').text(balance);
     })
   }
 
-
-  let updateEntitlement = function() {
+  // Calculate based on the last_claimed time.
+  // Calling the checkEntitlement function returns inconsistent values.
+  let updateMyEntitlement = function() {
     contract.last_claimed.call(web3js.eth.accounts[0],
       function (err, res) {
         if (err) {
@@ -144,28 +145,62 @@ function startApp(web3js) {
         }
         else {
           let last_claimed = res.c[0];
-          console.log('in updateentitlement, last claimed = ' + last_claimed);
+          console.log('in updateMyEntitlement, last claimed = ' + last_claimed);
 
-          contract.MINTING_COEFFICIENT.call(web3js.eth.accounts[0],
-            function (err, res) {
-              if (err) {
-                return console.error(err);;
-              }
-              else {
-                let minting_coefficient = res.c[0]
-                let entitlement = Math.round(minting_coefficient * ((Date.now() / 1000) - last_claimed));
-                console.log('in updateentitlement = ' + entitlement);
-                $('#token_entitlement').text(entitlement);
-              }
-          });
+          // if this is user's first claim
+          if (last_claimed == 0 ) {
+            console.log('no previous claims')
+            $('#token_entitlement').text(10);
+          }
+          else {
+            contract.MINTING_COEFFICIENT({
+              'from':web3js.eth.accounts[0]
+              },
+              function (err, res) {
+                if (err) {
+                  return console.error(err);;
+                }
+                else {
+                  let minting_coefficient = res.c[0]
+                  let entitlement = Math.round(minting_coefficient * ((Date.now() / 1000) - last_claimed));
+                  console.log("res =" )
+                  console.log(res)
+                  console.log('Date.now() / 1000 =' + (Date.now() / 1000))
 
+                  console.log('minting_coefficient =' + minting_coefficient)
+                  console.log('entitlement =' + entitlement)
+                  $('#token_entitlement').text(entitlement);
+                }
+            });
+          }
         }
     });
   }
-  
+
+  $('.set').on('click', function () {
+    let coefficient = parseInt($('.coefficient').val());
+
+    if (!Number.isInteger(coefficient)) {
+      console.error('Minting coefficient is not a number')
+      return
+    }
+    else {
+      console.log("setting minting coefficient to " + coefficient)
+      contract.setMintingCoefficient(coefficient, {
+        'from':web3js.eth.accounts[0]
+        },
+        function (err, transactionHash) {
+          console.log(err, transactionHash);
+          return web3.eth.getTransactionReceiptMined(transactionHash, 5000).then(function (receipt) {
+            console.log('minting coefficient set')
+          });
+      });
+    }
+  });
+
   $('.update').on('click', function () {
-    updateBalance();
-    updateEntitlement();
+    updateMyBalance();
+    updateMyEntitlement();
   });
 
   $('.claim').on('click', function () {
@@ -177,14 +212,14 @@ function startApp(web3js) {
         return web3.eth.getTransactionReceiptMined(transactionHash, 5000).then(function (receipt) {
           // wait 3 seconds to update balance as it will not have updated if we call immediately
           setTimeout(function(){
-            updateBalance();
-            updateEntitlement();
+            updateMyBalance();
+            updateMyEntitlement();
           }, 5000);
         });
     });
   });
 
-  updateBalance();
-  updateEntitlement();
+  updateMyBalance();
+  updateMyEntitlement();
   $('#eth_address').text(web3js.eth.accounts[0]);
 }
