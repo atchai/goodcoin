@@ -79,15 +79,13 @@ window.addEventListener('load', function() {
 
 // // TODO:
 // Ensure web3js.eth.accounts reflects the logged in metamask account
-// Upgrade to web3 beta v1
 
 function startApp(web3js) {
   var contract = web3js.eth.contract(abi).at(contract_address);
 
   //console.log('contract = ')
-  console.log(web3js)
-  console.log(contract)
-  console.log('test')
+  //console.log(web3js)
+  //console.log(contract)
 
 
   web3.eth.getTransactionReceiptMined = function getTransactionReceiptMined(txHash, interval) {
@@ -128,6 +126,41 @@ function startApp(web3js) {
     });
   }
 
+
+  let getMintingCoefficient = function(callback) {
+    contract.MINTING_COEFFICIENT({
+      'from':web3js.eth.accounts[0]
+      },
+      function (err, res) {
+        if (err) {
+          return console.error(err);;
+        }
+        else {
+          callback(res.c[0])
+        }
+    });
+  }
+
+  let updateAllBalances = function() {
+    let balances = [];
+    for(let i=0; i < test_accounts.length; ++i ) {
+      getBalance(test_accounts[i], function(balance) {
+        balances[i] = balance;
+
+        if (i == test_accounts.length-1) {
+          let html = ''
+          for (let i=0; i < test_accounts.length; ++i ) {
+            html += "<tr>"
+            html += "<td>"+test_accounts[i]+"</td>";
+            html += "<td>"+balances[i]+"</td>";
+            html += "</tr>"
+          }
+          $('#account-balances tr:last').after(html)
+        }
+      })
+    }
+  }
+
   let updateMyBalance = function() {
     getBalance(web3js.eth.accounts[0], function(balance) {
       console.log('in updateMyBalance = ' + balance)
@@ -135,7 +168,7 @@ function startApp(web3js) {
     })
   }
 
-  // Calculate based on the last_claimed time.
+  // Calculate locally based on the last_claimed time.
   // Calling the checkEntitlement function returns inconsistent values.
   let updateMyEntitlement = function() {
     contract.last_claimed.call(web3js.eth.accounts[0],
@@ -164,20 +197,6 @@ function startApp(web3js) {
               $('#token_entitlement').text(entitlement);
             })
           }
-        }
-    });
-  }
-
-  let getMintingCoefficient = function(callback) {
-    contract.MINTING_COEFFICIENT({
-      'from':web3js.eth.accounts[0]
-      },
-      function (err, res) {
-        if (err) {
-          return console.error(err);;
-        }
-        else {
-          callback(res.c[0])
         }
     });
   }
@@ -232,6 +251,7 @@ function startApp(web3js) {
 
   updateMyBalance();
   updateMyEntitlement();
-  updateMintingCoefficient()
+  updateMintingCoefficient();
+  updateAllBalances();
   $('#eth_address').text(web3js.eth.accounts[0]);
 }

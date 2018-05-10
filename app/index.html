@@ -8,99 +8,89 @@
 </head>
 <body>
 
-  <!-- METAMASK NOT INSTALLED  -->
+      <!-- METAMASK NOT INSTALLED  -->
 
-  <div class="container" id="metamask-install" style="display:none">
-    <div class="row" style="margin: 50 0 50 0px">
-      <div class="col-md-12 text-center">
-        <h2>You need to install Metamask</h2>
-        <p>It looks like you're not using an ethereum enabled browser.  The simplest way to solve this is to</p>
-        <h4><a href="https://metamask.io/">Download Metamask</a></h4>
-        <p>You will need to install Metamask and then refresh this page.  If you are using the live ethereum network then you will also need to pay for some ether in your account.</p>
+      <div class="container" id="metamask-install" style="display:none">
+        <div class="row" style="margin: 50 0 50 0px">
+          <div class="col-md-12 text-center">
+            <h2>You need to install Metamask</h2>
+            <p>It looks like you're not using an ethereum enabled browser.  The simplest way to solve this is to</p>
+            <h4><a href="https://metamask.io/">Download Metamask</a></h4>
+            <p>You will need to install Metamask and then refresh this page.  If you are using the live ethereum network then you will also need to pay for some ether in your account.</p>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- METAMASK NOT LOGGED IN  -->
+      <!-- METAMASK NOT LOGGED IN  -->
 
-  <div class="container" id="metamask-login" style="display:none">
-    <div class="row" style="margin: 50 0 50 0px">
-      <div class="col-md-12 text-center">
-        <h2>You are not logged in to Metamask</h2>
-        <p>It looks like you have Metamask installed but you are not logged in.  Please log in and refresh the page</p>
+      <div class="container" id="metamask-login" style="display:none">
+        <div class="row" style="margin: 50 0 50 0px">
+          <div class="col-md-12 text-center">
+            <h2>You are not logged in to Metamask</h2>
+            <p>It looks like you have Metamask installed but you are not logged in.  Please log in and refresh the page</p>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- WRONG NETWORK  -->
+      <!-- WRONG NETWORK  -->
 
-  <div class="container" id="metamask-network" style="display:none">
-    <div class="row" style="margin: 50 0 50 0px">
-      <div class="col-md-12 text-center">
-        <h2>Please use Ropsten Network</h2>
-        <p>This dapp is only available on the Ropsten network at the moment, please switch network in the top left hand corner of MetaMask.</p>
-        <p>You can then <a href="https://faucet.metamask.io/">collect some free ether from the faucet here</a>.</p>
+      <div class="container" id="metamask-network" style="display:none">
+        <div class="row" style="margin: 50 0 50 0px">
+          <div class="col-md-12 text-center">
+            <h2>Please use Ropsten Network</h2>
+            <p>This dapp is only available on the Ropsten network at the moment, please switch network in the top left hand corner of MetaMask.</p>
+            <p>You can then <a href="https://faucet.metamask.io/">collect some free ether from the faucet here</a>.</p>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- CONTENT  -->
+      <!-- CONTENT  -->
 
-  <div class="container col-xs-1 text-center" id="main-content" style="display:none">
+      <div class="container col-xs-1 text-center" id="main-content" style="display:none">
 
-    <h1>Goodcoin POC</h1>
+        <h1>Goodcoin POC</h1>
 
-    <p>You are logged in as:
-    <p class="text-muted"> <span id="eth_address"></span></p>
-    <br>
+        <p>You are logged in as:
+        <p class="text-muted"> <span id="eth_address"></span></p>
+        <br>
 
-    <p>You have <b><span id="token_count" class="text-success"></span></b> GTC tokens</p>
+        <p>You have <b><span id="token_count" class="text-success"></span></b> GTC tokens</p>
 
-    <p>You are entitled to claim <b><span id="token_entitlement" class="text-success"></span></b> GTC tokens</p>
+        <p>You are entitled to claim <b><span id="token_entitlement" class="text-success"></span></b> GTC tokens</p>
 
-    <div class="container">
-      <button class="update btn btn-primary">Update Stats</button>
-    </div>
-    <br>
-    <div class="container">
-      <button class="claim btn btn-success">Claim Tokens</button>
-    </div>
-  </div>
+        <div class="container">
+          <button class="update btn btn-primary">Update Stats</button>
+        </div>
+        <br>
+        <div class="container">
+          <button class="claim btn btn-success">Claim Tokens</button>
+        </div>
+      </div>
 
 
-  <div class="container col-xs-1 text-center" id="admin-content">
-    <hr>
-    <h2>Admin tools</h2>
-    <p>This section is only available when you are logged into Metamask with the contract owner account</p>
+      <div class="container col-xs-1 text-center" id="admin-content">
+        <hr>
+        <h2>Admin tools</h2>
+        <p>This section is only available when you are logged into Metamask with the contract owner account</p>
 
-    <h3>Account Balances</h3>
+        <h3>Account Balances</h3>
 
-    <table class="table text-center">
-      <tr>
-        <th>Account</th>
-        <th>Balance</th>
-      </tr>
-      <tr>
-        <td>John</td>
-        <td>Doe</td>
-      </tr>
-      <tr>
-        <td>Jane</td>
-        <td>Doe</td>
-      </tr>
-    </table>
+        <table class="table text-center" id="account-balances">
+          <tr>
+            <th>Account</th>
+            <th>Balance</th>
+          </tr>
+        </table>
 
-    <h3>Set Minting Frequency</h3>
-    <p>This is the number of tokens that each user is eligible to claim per second since their last claim</p>
-    <div class="form-group form-group-sm">
-      <input type="number" class="input-sm text form-control coefficient" placeholder="">
-      <button class="set btn btn-success">Set Minting Co-efficient</button>
-    </div>
-  </div>
+        <h3>Set Minting Frequency</h3>
+        <p>This is the number of tokens that each user is eligible to claim per second since their last claim</p>
+        <div class="form-group form-group-sm">
+          <input type="number" class="input-sm text form-control coefficient" placeholder="">
+          <button class="set btn btn-success">Set Minting Co-efficient</button>
+        </div>
 
-
-Add instructions for these tokens to show up in metamask. - link to readme?
-
+        <p><a href="https://github.com/atchai/goodcoin/blob/master/README.md">See README for instructions</a></p>
+      </div>
 
 
   </body>
