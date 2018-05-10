@@ -56,6 +56,9 @@ window.addEventListener('load', function() {
             else if (net_id == network_id) {
               console.log("User is logged in and on correct network");
               $('#main-content').show();
+
+              // show admin content if we are the contract owner
+              if (web3.eth.accounts[0] == owner_account) $('#admin-content').show();
               startApp(web3js);
             }
 
