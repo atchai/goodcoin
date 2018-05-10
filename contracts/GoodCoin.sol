@@ -5,7 +5,7 @@ import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 
 contract GoodCoin is StandardToken, Ownable {
     string public name = 'GoodCoin';
-    string public symbol = 'GDC';
+    string public symbol = 'GTC';
     uint8 public decimals = 18;
     uint public INITIAL_SUPPLY = 12000;
     uint public MINTING_COEFFICIENT = 1;
@@ -15,7 +15,7 @@ contract GoodCoin is StandardToken, Ownable {
 
     bool public mintingFinished = false;
 
-    mapping (address => uint) last_claimed;
+    mapping (address => uint) public last_claimed;
 
     modifier canMint() {
       require(!mintingFinished);

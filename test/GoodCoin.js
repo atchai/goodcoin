@@ -11,14 +11,60 @@ contract("GoodCoin", accounts => {
     assert.equal(owner, accounts[0]);
   });
 
-  // owner has initial balance of 12000
+  it("Should give the owner 12000 tokens", async () => {
+    let instance = await GoodCoin.deployed();
+    let owner = await instance.owner();
+    let balance = (await instance.balanceOf.call(accounts[0])).toNumber();
 
-  // checkEntitlement returns a correct result for first claim
+    assert.equal(balance, 12000);
+  });
+
+  it("Should give a first-time user a zero-balance", async () => {
+    let instance = await GoodCoin.deployed();
+    let balance = (await instance.balanceOf.call(accounts[1])).toNumber();
+
+    assert.equal(balance, 0);
+  });
+
+  it("Should entitle a first-time users to 10 tokens", async () => {
+    let instance = await GoodCoin.deployed();
+    let owner = await instance.owner();
+    let entitlement = (await instance.checkEntitlement.call(accounts[1])).toNumber();
+
+    assert.equal(entitlement, 10);
+  });
 
 
-  // checkEntitlement returns a credible result for subsequent claims
+
+  it("Should withdraw your entitlement", async () => {
+    let instance = await GoodCoin.deployed();
+    let entitlement = (await instance.checkEntitlement.call(accounts[1])).toNumber();
+    await instance.withdrawTokens( {from: accounts[1]});
+    let balance = (await instance.balanceOf.call(accounts[1])).toNumber();
+
+    assert.equal(balance, entitlement);
+  });
+
+
+  it("Should entitle you to ~1 token per second after the first withdrawal", async () => {
+    let instance = await GoodCoin.deployed();
+    await instance.withdrawTokens( {from: accounts[1]});
+    await setTimeout(function(){
+    }, 1000);
+    let entitlement = (await instance.checkEntitlement.call(accounts[1])).toNumber();
+
+    assert.equal(entitlement, 0);
+  });
+
+
+// last claim date
 
 
   // can make transfers
+
+  // only owner can minted
+
+  // owner can change MINTING_COEFFICIENT
+
 
 });

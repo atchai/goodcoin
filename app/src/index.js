@@ -153,28 +153,39 @@ function startApp(web3js) {
             $('#token_entitlement').text(10);
           }
           else {
-            contract.MINTING_COEFFICIENT({
-              'from':web3js.eth.accounts[0]
-              },
-              function (err, res) {
-                if (err) {
-                  return console.error(err);;
-                }
-                else {
-                  let minting_coefficient = res.c[0]
-                  let entitlement = Math.round(minting_coefficient * ((Date.now() / 1000) - last_claimed));
-                  console.log("res =" )
-                  console.log(res)
-                  console.log('Date.now() / 1000 =' + (Date.now() / 1000))
+            getMintingCoefficient(function (coefficient) {
+              let entitlement = Math.round(coefficient * ((Date.now() / 1000) - last_claimed));
+              console.log("res =" )
+              console.log(res)
+              console.log('Date.now() / 1000 =' + (Date.now() / 1000))
 
-                  console.log('minting_coefficient =' + minting_coefficient)
-                  console.log('entitlement =' + entitlement)
-                  $('#token_entitlement').text(entitlement);
-                }
-            });
+              console.log('minting_coefficient =' + coefficient)
+              console.log('entitlement =' + entitlement)
+              $('#token_entitlement').text(entitlement);
+            })
           }
         }
     });
+  }
+
+  let getMintingCoefficient = function(callback) {
+    contract.MINTING_COEFFICIENT({
+      'from':web3js.eth.accounts[0]
+      },
+      function (err, res) {
+        if (err) {
+          return console.error(err);;
+        }
+        else {
+          callback(res.c[0])
+        }
+    });
+  }
+
+  let updateMintingCoefficient = function() {
+    getMintingCoefficient(function (coefficient) {
+        $('.coefficient').attr("placeholder", coefficient);
+    })
   }
 
   $('.set').on('click', function () {
@@ -221,5 +232,6 @@ function startApp(web3js) {
 
   updateMyBalance();
   updateMyEntitlement();
+  updateMintingCoefficient()
   $('#eth_address').text(web3js.eth.accounts[0]);
 }

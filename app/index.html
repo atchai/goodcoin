@@ -68,13 +68,34 @@
   </div>
 
 
-  <div class="container col-xs-1 text-center" id="main-content">
+  <div class="container col-xs-1 text-center" id="admin-content">
+    <hr>
+    <h2>Admin tools</h2>
+    <p>This section is only available when you are logged into Metamask with the contract owner account</p>
 
-    <div class="form-group form-inline">
-      <input type="number" class="text form-control coefficient" placeholder="">
+    <h3>Account Balances</h3>
+
+    <table class="table text-center">
+      <tr>
+        <th>Account</th>
+        <th>Balance</th>
+      </tr>
+      <tr>
+        <td>John</td>
+        <td>Doe</td>
+      </tr>
+      <tr>
+        <td>Jane</td>
+        <td>Doe</td>
+      </tr>
+    </table>
+
+    <h3>Set Minting Frequency</h3>
+    <p>This is the number of tokens that each user is eligible to claim per second since their last claim</p>
+    <div class="form-group form-group-sm">
+      <input type="number" class="input-sm text form-control coefficient" placeholder="">
       <button class="set btn btn-success">Set Minting Co-efficient</button>
     </div>
-
   </div>
 
 
