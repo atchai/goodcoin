@@ -19,7 +19,7 @@ You have been provided with the details of 1 owner and 5 test user accounts.  Pl
 
 * Log into a test user account in Metamask (make sure you're on Ropsten network)
 
-* Go to (http://goodcoin.atchai.com/)[http://goodcoin.atchai.com/]
+* Go to [http://goodcoin.atchai.com/](http://goodcoin.atchai.com/)
 
 ![alt text](https://github.com/atchai/goodcoin/raw/master/docs/new-user.png "screenshot")
 
@@ -43,9 +43,9 @@ This process will cause the contract to mint the number of tokens that you are e
 * Here you can see at a glance the GTC token balances of each of the test accounts and you can also set the minting co-efficient - the number of tokens that users will be entitled to each second since their last claim.
 
 
-
-
 ## Development
+
+### Prerequisites
 
 * Node.js v8.9.4
 * Ganache (or some other local test ethereum node)
@@ -53,6 +53,8 @@ This process will cause the contract to mint the number of tokens that you are e
 * The following environment variables set in a .env file in /app:
   * MNEMONIC  (seed mnemonic of an account where first derived address has positive balance)
   * INFURA_API (infura eth node api key)
+
+### Installation
 
 ```
 npm install
