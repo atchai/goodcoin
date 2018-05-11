@@ -32,7 +32,7 @@ module.exports = {
         return new HDWalletProvider(mnemonic, "https://ropsten.infura.io/" + infura_api)
       },
       network_id: network_id,
-      gas:4712388
+      gas:2071238
     }
   },
   solc: {

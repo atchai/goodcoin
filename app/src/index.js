@@ -9,22 +9,29 @@ let owner_account = undefined
 let test_accounts = undefined
 
 // production
-if (window.location.hostname == 'goodcoin.atchai.com') {
-  contract_address = '';  //ropsten
+//if (window.location.hostname == 'goodcoin.atchai.com') {
+  contract_address = '0x25f33068c4807c7485ccc98a23052bb361d3accb';  //ropsten
   network_id = 3 // ropsten - ethereum network ID
+  owner_account = '0x86970E4fF9E26Dd88697D9044297b1dF4aE85413';
+  test_accounts = [ '0x9107a6b3a1cD26cb5c4ECaa661853b8C0d6fBc31',
+                    '0xdC8d9b9f7beF52269b1eC83cEdEb279c47cC6AaA',
+                    '0x3250275F4E09beCCB0811C4EA35f7bFfd402eb25',
+                    '0x97B9B511f22a8000a918643ab9CaBd23E80209E2',
+                    '0x5369bBCa32a7d1a9a5846beFBDcDf497b555c478'];
+/*
 }
 // dev
 else {
   contract_address = '0x345ca3e014aaf5dca488057592ee47305d9b3e10';  //dev
   network_id = 5777 // ganache - ethereum network ID
-  owner_account = '0x345ca3e014aaf5dca488057592ee47305d9b3e10';
+  owner_account = '0x627306090abab3a6e1400e9345bc60c78a8bef57';
   test_accounts = [ '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
                     '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
                     '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
                     '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
                     '0x345ca3e014aaf5dca488057592ee47305d9b3e10'];
 }
-
+*/
 const abi = require('./abi.js');
 
 
@@ -58,7 +65,9 @@ window.addEventListener('load', function() {
               $('#main-content').show();
 
               // show admin content if we are the contract owner
-              if (web3.eth.accounts[0] == owner_account) $('#admin-content').show();
+              if (web3.eth.accounts[0].toLowerCase() == owner_account.toLowerCase()) {
+                $('#admin-content').show();
+              }
               startApp(web3js);
             }
 
