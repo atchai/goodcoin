@@ -7,7 +7,7 @@ contract GoodCoin is StandardToken, Ownable {
     string public name = 'GoodCoin';
     string public symbol = 'GTC';
     uint8 public decimals = 18;
-    uint public INITIAL_SUPPLY = 12000;
+    uint public INITIAL_SUPPLY = 1000000000;
     uint public MINTING_COEFFICIENT = 1;
 
     event Mint(address indexed to, uint256 amount);

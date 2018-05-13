@@ -5,7 +5,7 @@ Goodcoin is a UBI system built on the Ethereum blockchain.
 This repo contains the code for the v0.1 proof of concept.  This POC provides the following functionality:
 
 * ERC-20 token - GTC (GoodCoin Test Coin)
-* On deployment, mint and transfer 1200 tokens to the contract owner
+* On deployment, mint and transfer 1000000000 tokens to the contract owner
 * Anyone can mint and claim tokens subject to time-based rules:
   * First time user - can claim 10 Tokens
   * Non-first time user - can claim 1 token per second since the last claim

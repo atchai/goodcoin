@@ -10,7 +10,7 @@ let test_accounts = undefined
 
 // production
 //if (window.location.hostname == 'goodcoin.atchai.com') {
-  contract_address = '0x25f33068c4807c7485ccc98a23052bb361d3accb';  //ropsten
+  contract_address = '0x25ad2fb0d6ab1122633ccde2b430dfd381cff650';  //ropsten
   network_id = 3 // ropsten - ethereum network ID
   owner_account = '0x86970E4fF9E26Dd88697D9044297b1dF4aE85413';
   test_accounts = [ '0x9107a6b3a1cD26cb5c4ECaa661853b8C0d6fBc31',
@@ -137,7 +137,6 @@ function startApp(web3js) {
         }
     });
   }
-
 
   let getMintingCoefficient = function(callback) {
     contract.MINTING_COEFFICIENT({
