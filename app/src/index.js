@@ -88,17 +88,8 @@ window.addEventListener('load', function() {
 })
 
 
-
-// // TODO:
-// Ensure web3js.eth.accounts reflects the logged in metamask account
-
 function startApp(web3js) {
   var contract = web3js.eth.contract(abi).at(contract_address);
-
-  //console.log('contract = ')
-  //console.log(web3js)
-  //console.log(contract)
-
 
   web3.eth.getTransactionReceiptMined = function getTransactionReceiptMined(txHash, interval) {
       const self = this;
@@ -126,16 +117,19 @@ function startApp(web3js) {
       }
   };
 
-  let getBalance = function(account, callback) {
-    contract.balanceOf(account,
-      function (err, res) {
-        if (err) {
-          return console.error(err);;
-        }
-        else {
-          callback(res.c[0]);
-        }
-    });
+  let getBalance = function(account) {
+    return new Promise(function(resolve, reject) {
+      contract.balanceOf(account,
+        function (err, res) {
+          if (err) {
+            console.error(err);
+            reject(err);
+          }
+          else {
+            resolve(res.c[0]);
+          }
+      });
+    })
   }
 
   let getMintingCoefficient = function(callback) {
@@ -152,31 +146,26 @@ function startApp(web3js) {
     });
   }
 
-  let updateAllBalances = function() {
+  let updateAllBalances = async function() {
     let balances = [];
-    for(let i=0; i < test_accounts.length; ++i ) {
-      getBalance(test_accounts[i], function(balance) {
-        balances[i] = balance;
-
-        if (i == test_accounts.length-1) {
-          let html = ''
-          for (let i=0; i < test_accounts.length; ++i ) {
-            html += "<tr>"
-            html += "<td>"+test_accounts[i]+"</td>";
-            html += "<td>"+balances[i]+"</td>";
-            html += "</tr>"
-          }
-          $('#account-balances tr:last').after(html)
-        }
-      })
-    }
+    const promises = test_accounts.map(getBalance)
+    await Promise.all(promises).then(function(balances) {
+      let html = ''
+      for (let i=0; i < test_accounts.length; ++i ) {
+        html += "<tr>"
+        html += "<td>"+test_accounts[i]+"</td>";
+        html += "<td>"+balances[i]+"</td>";
+        html += "</tr>"
+      }
+      $('#account-balances tr:last').after(html)
+    })
   }
 
   let updateMyBalance = function() {
-    getBalance(web3js.eth.accounts[0], function(balance) {
+    getBalance(web3js.eth.accounts[0]).then(function(balance) {
       console.log('in updateMyBalance = ' + balance)
       $('#token_count').text(balance);
-    })
+    });
   }
 
   // Calculate locally based on the last_claimed time.
