@@ -9,7 +9,8 @@ let owner_account = undefined
 let test_accounts = undefined
 
 // production
-//if (window.location.hostname == 'goodcoin.atchai.com') {
+if (window.location.hostname == 'goodcoin.atchai.com') {
+  console.log('production')
   contract_address = '0x25ad2fb0d6ab1122633ccde2b430dfd381cff650';  //ropsten
   network_id = 3 // ropsten - ethereum network ID
   owner_account = '0x86970E4fF9E26Dd88697D9044297b1dF4aE85413';
@@ -18,10 +19,11 @@ let test_accounts = undefined
                     '0x3250275F4E09beCCB0811C4EA35f7bFfd402eb25',
                     '0x97B9B511f22a8000a918643ab9CaBd23E80209E2',
                     '0x5369bBCa32a7d1a9a5846beFBDcDf497b555c478'];
-/*
+
 }
 // dev
 else {
+  console.log('dev')
   contract_address = '0x345ca3e014aaf5dca488057592ee47305d9b3e10';  //dev
   network_id = 5777 // ganache - ethereum network ID
   owner_account = '0x627306090abab3a6e1400e9345bc60c78a8bef57';
@@ -31,9 +33,8 @@ else {
                     '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
                     '0x345ca3e014aaf5dca488057592ee47305d9b3e10'];
 }
-*/
-const abi = require('./abi.js');
 
+const abi = require('./abi.js');
 
 
 // Check for Metamask and show/hide appropriate warnings.
