@@ -1,0 +1,434 @@
+/*-- LAYOUT --*/
+
+@media (min-width: 1200px) {
+	.container {
+		max-width: 760px;
+	}
+}
+
+/*-- FONTS --*/
+
+@font-face {
+	font-family: 'Freight Sans Pro Semibold';
+
+	src: url('../assets/fonts/freight-sans-pro-semibold.eot');
+	src: url('../assets/fonts/freight-sans-pro-semibold.woff2') format('woff2'),
+		url('../assets/fonts/freight-sans-pro-semibold.woff') format('woff'),
+		url('../assets/fonts/freight-sans-pro-semibold.ttf') format('truetype'),
+		url('../assets/fonts/freight-sans-pro-semibold.svg') format('svg');
+}
+
+/*-- COMMON ELEMENTS --*/
+
+body {
+	background-color: #F7F7F7;
+}
+
+h2 {
+	font-family: 'Freight Sans Pro Semibold', Arial, sans-serif;
+	font-size: 18px;
+	margin: 0;
+	color: #56555f;
+}
+
+p {
+	margin: 0;
+	font-size: 14.4px;
+}
+
+input {
+	box-shadow: none;
+	border: 1px solid #7b7b7b;
+	height: 38px !important;
+	width: 32%;
+	padding: 0 8px;
+}
+
+	input:focus {
+		outline: none;
+		box-shadow: unset !important;
+	}
+
+.row {
+	justify-content: space-between;
+}
+
+.container--white {
+	background-color: white;
+	padding: 12px 28px 24px;
+	margin: 0 0 24px;
+	border: 1px solid #D3D3D3;
+	border-radius: 4px;
+	position: relative;
+}
+
+.container__header {
+	height: 50px;
+}
+
+	.container__header:after {
+		content: "";
+		border-bottom: solid 1px #D3D3D3;
+		position: absolute;
+		width: 100%;
+		left: 0;
+		top: 44px;
+	}
+
+	@media (max-width: 480px) {
+		#admin-content .container__header:after {
+			width: 160%;
+		}
+	}
+
+.container__cta {
+	text-align: right;
+}
+
+.field {
+	padding: 14px 0;
+	display: flex;
+}
+
+.label--white {
+	font-size: 13px;
+	color: white;
+	margin-bottom: 0;
+	text-transform: uppercase;
+	font-weight: 500;
+	opacity: 0.7;
+}
+
+.label--dark {
+	font-weight: 900;
+	margin: 0 12px 0 0;
+}
+
+.value--white {
+	color: white;
+	font-size: 20px;
+	font-weight: 900;
+	margin-bottom: 0;
+	word-wrap: break-word;
+}
+
+.btn {
+	padding: 0;
+	background: transparent;
+	box-shadow: none;
+	opacity: 0.7;
+	text-transform: capitalize;
+	font-family: 'Freight Sans Pro Semibold', Arial, sans-serif;
+	font-size: 16px;
+	text-align: center;
+}
+	.btn:hover {
+		opacity: 1;
+	}
+
+	.btn:focus {
+		outline: none;
+		box-shadow: none;
+	}
+
+	.check-price-sell.btn img,
+	.check-price-buy.btn img {
+		width: 26px;
+	}
+
+	.update.btn:hover, 
+	.check-price-sell.btn:hover,
+	.check-price-buy.btn:hover {
+		transform: rotate(180deg);
+	}
+
+.btn--dark {
+	background: #2B3236;
+	border-radius: 4px;
+	color: #FFFFFF;
+	padding: 8px 32px;
+	opacity: 0.9;
+}
+
+.btn--blue {
+	background: #1c6465;
+	color: #FFFFFF;
+	padding: 8px 32px;
+	opacity: 0.9;
+}
+
+.table th {
+	border-top: none;
+}
+
+.table td {
+	opacity: 0.7;
+}
+
+/*-- HEADER --*/
+
+header {
+	background: -webkit-linear-gradient(#454F5B 6%, #0D1E23 94%);
+	background: -o-linear-gradient(#454F5B 6%, #0D1E23 94%);
+	background: linear-gradient(#454F5B 6%, #0D1E23 94%);
+	width: 100vw;
+	height: 50px;
+	height: 50px;
+	display: flex;
+	align-items: center;
+}
+
+nav {
+	width: 94%;
+	margin: 0 auto;
+	height: 100%;
+	display: flex;
+}
+
+	@media (max-width: 480px) {
+		nav {
+			margin: 0 15px;
+		}
+	}
+
+.logo {
+	width: 100px;
+}
+
+/*-- MAIN CONTENT --*/
+
+#main-content {
+	margin: 136px auto 62px;
+}
+
+	@media (max-width: 760px) {
+		#main-content {
+			width: 90%;
+		}
+	}
+
+#claim-banner {
+	background-color: white;
+	width: 100vw;
+	margin: auto;
+	position: absolute;
+	left: 0;
+	top: 50px;
+	height: 86px;
+	box-shadow: 0 2px 5px 0 rgba(0,0,0,0.11);
+}
+	
+
+	#claim-banner .container {
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	
+	@media (max-width: 760px) {
+		#claim-banner .container {
+			width: 90%;
+		}
+	}
+
+	#claim-banner .container__left {
+		display: flex;
+		padding-right: 10px;
+	}
+
+	#claim-banner h2 {
+		color: #2c2b2f;
+	}
+
+	.icon--coins {
+		margin-right: 14px;
+	}
+
+.title {
+	font-family: 'Freight Sans Pro Semibold', Arial, sans-serif;
+	font-size: 40px;
+	width: 100%;
+	text-align: center;
+}
+
+.subtitle {
+	font-size: 18px;
+	width: 100%;
+	text-align: center;
+	opacity: 0.8;
+}
+
+#wallet {
+	background-color: #25B2B4;
+	border-radius: 4px;
+	margin: 42px 0;
+	padding: 24px 28px;
+	box-shadow: 4px 4px 25px 6px rgba(0,0,0,0.11);
+}
+
+	#wallet__header {
+		padding: 0;
+		margin-bottom: 30px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	#wallet h2 {
+		color: #0E4041;
+		font-size: 26px;
+	}
+
+	#wallet__details {
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+
+	.wallet__field:nth-child(1) {
+		padding-right: 20px;
+		border-right: 1px solid rgba(255, 255, 255, 0.52);
+	}
+
+	.wallet__field:nth-child(2) {
+		padding-left: 20px;
+	}
+
+		@media (max-width: 991px) {
+			.wallet__field {
+				padding: 10px 0;
+				width: 100%;
+			}
+
+			.wallet__field:nth-child(1) {
+				padding-right: 20;
+				border-right: unset;
+			}
+
+			.wallet__field:nth-child(2) {
+				padding-left: 0;
+			}
+		}
+
+#buying, #selling {
+	width: 48%;
+}
+
+	@media (max-width: 767px) {
+		#buying, #selling {
+			width: 100%;
+		}
+	}
+
+	.estimate {
+		display: flex;
+		margin-bottom: 24px;
+	}
+
+	.estimate-input, .whitelist-input {
+		align-items: center;
+		width: 100%;
+	}
+
+	.estimate-input {
+		width: 50%;
+	}
+
+	.whitelist-input {
+		margin-top: 20px;
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.estimate-output {
+		flex-direction: column;
+		width: 50%;
+		padding-left: 28px;
+		position: relative;
+		overflow: hidden;
+	}
+
+		.estimate-amount {
+			font-size: 24px;
+			font-weight: 600;
+			line-height: 26px;
+			position: absolute;
+			bottom: 6px;
+			width: 100%;
+			padding: 2px 8px;
+			margin-right: 28px;
+			background-color: #e6e6e6b5;
+			height: 46%;
+		}
+
+	.estimate-output .label--dark {
+		margin-right: 12px;
+		position: relative;
+		top: -6px;
+		font-weight: 400;
+	}
+
+	.buy-amount, .sell-amount {
+		margin-right: 12px;
+		width: 90%;
+	}
+
+
+	.whitelist-input .label--dark {
+		width: 130px;
+	}
+
+	.wl-account { 
+		width: 40%;
+		margin-right: 12px;
+	}
+
+	@media (max-width: 767px) {
+		.wl-account {
+			width: 100%;
+			margin: 10px 0 0 auto;
+		}
+
+		.whitelist.btn.btn--dark {
+			margin-top: 24px;
+			margin-left: auto;
+		}
+	}
+
+#admin-content {
+	overflow-x: scroll;
+}
+
+	.admin-tools__header {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 30px;
+		margin-top: 20px;
+		padding-top: 30px;
+		border-top: 1px solid rgba(80, 89, 95, 0.45)
+	}
+
+	.admin-tools__header h2 {
+		color: #26b2b4;
+		font-size: 26px;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

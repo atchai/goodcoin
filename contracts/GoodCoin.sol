@@ -1,19 +1,23 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.24;
 
+import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 import 'zeppelin-solidity/contracts/token/ERC20/StandardToken.sol';
 import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 
 contract GoodCoin is StandardToken, Ownable {
+    using SafeMath for uint256;
     string public name = 'GoodCoin';
     string public symbol = 'GTC';
     uint8 public decimals = 18;
-    uint public INITIAL_SUPPLY = 1000000000;
-    uint public MINTING_COEFFICIENT = 1;
+    uint public INITIAL_SUPPLY = 0;
 
+    event Burn(address indexed burner, uint256 value);
     event Mint(address indexed to, uint256 amount);
     event MintFinished();
+    event PopulatedMarket();
 
     bool public mintingFinished = false;
+    bool public populatedMarket = false;
 
     mapping (address => uint) public last_claimed;
 
@@ -22,11 +26,31 @@ contract GoodCoin is StandardToken, Ownable {
       _;
     }
 
-    constructor() public {
-      totalSupply_ = INITIAL_SUPPLY;
-      balances[msg.sender] = INITIAL_SUPPLY;
+    modifier canPopulate() {
+      require(!populatedMarket);
+      _;
     }
 
+    function initialMove(address _gcm) canMint canPopulate public onlyOwner returns(bool) {
+      // amount is 100 * 10^18 as each token seems to be viewed as
+      // a wei-like equivalent in the bancor formulas
+      uint256 amount = 100000000000000000000;
+
+      mint(_gcm, amount);
+
+      populatedMarket = true;
+      emit PopulatedMarket();
+
+      return true;
+    }
+
+    constructor() public {
+      totalSupply_ = INITIAL_SUPPLY;
+    }
+
+    function totalSupply() public view returns(uint256) {
+      return totalSupply_;
+    }
 
   /**
    * @dev Function to mint tokens
@@ -43,15 +67,6 @@ contract GoodCoin is StandardToken, Ownable {
   }
 
   /**
-   * @dev Owner can set a multiplier for token entitlement
-   * @return True if the operation was successful.
-   */
-  function setMintingCoefficient(uint _coefficient) onlyOwner public returns (bool) {
-    MINTING_COEFFICIENT = _coefficient;
-    return true;
-  }
-
-  /**
    * @dev Function to stop minting new tokens.
    * @return True if the operation was successful.
    */
@@ -62,30 +77,37 @@ contract GoodCoin is StandardToken, Ownable {
   }
 
   /**
-   * @dev Function to check how many tokens a user is entitled to mint
-   * @return Number of tokens you are entitled to
-   */
-  function checkEntitlement(address _user) public view returns(uint) {
-    // not first claim
-    if (last_claimed[_user] > 0) {
-      uint amount = MINTING_COEFFICIENT * (now - last_claimed[_user]);
-      return amount;
-    }
-    // first claim
-    else {
-      return 10;
-    }
-  }
-
-  /**
    * @dev Mint and transfer to sender all tokens they are entitled to
    * @return True if successful
    */
-  function withdrawTokens() canMint public returns (bool) {
-    uint amount = checkEntitlement(msg.sender);
-    last_claimed[msg.sender] = now;
-    mint(msg.sender, amount);
+  function withdrawTokens(address _to, uint256 _amount) canMint onlyOwner public returns (bool) {
+    mint(_to, _amount);
     return true;
   }
 
+  /**
+   * @dev Internal Function to Burn tokens
+   * @param _from The address that will lose the burned tokens.
+   * @param _amount The amount of tokens to burn.
+   * @return A boolean that indicates if the operation was successful.
+   */
+  function burn(address _from, uint256 _amount) private returns (bool) {
+    require(_amount <= balances[_from]);
+    balances[_from] = balances[_from].sub(_amount);
+
+    totalSupply_ = totalSupply_.sub(_amount);
+    emit Burn(_from, _amount);
+  }
+
+  /**
+   * @dev Callable Function to Burn tokens
+   * @param _from The address that will lose the burned tokens.
+   * @param _amount The amount of tokens to burn.
+   * @return A boolean that indicates if the operation was successful.
+   */
+  function burnTokens(address _from, uint256 _amount) onlyOwner public returns (bool) {
+    burn(_from, _amount);
+
+    return true;
+  }
 }

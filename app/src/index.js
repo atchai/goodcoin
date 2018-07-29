@@ -7,11 +7,16 @@ let contract_address = undefined
 let network_id = undefined
 let owner_account = undefined
 let test_accounts = undefined
+let redemption_functional_address = undefined
+let goodCoinMarketAddress = undefined
+let urlParams = new URLSearchParams(window.location.search);
 
 // production
-if (window.location.hostname == 'goodcoin.atchai.com') {
+if (window.location.hostname == 'goodcoin.atchai.com' || urlParams.has('prod')) {
   console.log('production')
-  contract_address = '0x25ad2fb0d6ab1122633ccde2b430dfd381cff650';  //ropsten
+  contract_address = '0x495bf815fd7b065d8ab491ff4cc18b9bb472e04a';  //ropsten
+  redemption_functional_address = '0xef672c34abc762590f18e6f9fb26739acf0f9da5';
+  goodCoinMarketAddress = '0x27cc97cc4a32d6dd6c62864c0956a3d2f1144d53';
   network_id = 3 // ropsten - ethereum network ID
   owner_account = '0x86970E4fF9E26Dd88697D9044297b1dF4aE85413';
   test_accounts = [ '0x9107a6b3a1cD26cb5c4ECaa661853b8C0d6fBc31',
@@ -23,19 +28,22 @@ if (window.location.hostname == 'goodcoin.atchai.com') {
 }
 // dev
 else {
-  console.log('dev')
-  contract_address = '0x345ca3e014aaf5dca488057592ee47305d9b3e10';  //dev
-  network_id = 5777 // ganache - ethereum network ID
-  owner_account = '0x627306090abab3a6e1400e9345bc60c78a8bef57';
-  test_accounts = [ '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
-                    '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
-                    '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
-                    '0x345ca3e014aaf5dca488057592ee47305d9b3e10',
-                    '0x345ca3e014aaf5dca488057592ee47305d9b3e10'];
+  console.log('dev');
+  contract_address = '0x891fa156f57882183f39d3a15248b9c8548f3661';  //dev
+  redemption_functional_address = '0x171f2b180518453765956b6c9d765937aeb381d3';
+  goodCoinMarketAddress = '0x3667a26971356491346cfde5f7793843182d66c3';
+  network_id = 6000 // ganache - ethereum network ID
+  owner_account = '0xc72B61B7C4e343beF326D24b905edb09d54B00B6';
+  test_accounts = [ '0xb3D1d7D38971245724cEb71e65BE54BC44083a3a',
+                    '0xf4444B538b14bcA7962dBFF264F92e4dCc3a005A',
+                    '0xc5656A71C0B909D3BaB72906dCE3817b34c90748',
+                    '0xE3330d9b3fd657c9590BbDCceBC2dC023e651b1F',
+                    '0x19532cE3e0dCc9e4360d27f696b5b72E84bc6937'];
 }
 
 const abi = require('./abi.js');
-
+const gcmAbi = require('./gcm_abi.js');
+const redemptionAbi = require('./redemption_abi.js');
 
 // Check for Metamask and show/hide appropriate warnings.
 window.addEventListener('load', function() {
@@ -91,6 +99,8 @@ window.addEventListener('load', function() {
 
 function startApp(web3js) {
   var contract = web3js.eth.contract(abi).at(contract_address);
+  var redemptionFunctional = web3js.eth.contract(redemptionAbi).at(redemption_functional_address);
+  var goodCoinMarket = web3js.eth.contract(gcmAbi).at(goodCoinMarketAddress);
 
   web3.eth.getTransactionReceiptMined = function getTransactionReceiptMined(txHash, interval) {
       const self = this;
@@ -127,24 +137,10 @@ function startApp(web3js) {
             reject(err);
           }
           else {
-            resolve(res.c[0]);
+            resolve(web3.fromWei(res));
           }
       });
     })
-  }
-
-  let getMintingCoefficient = function(callback) {
-    contract.MINTING_COEFFICIENT({
-      'from':web3js.eth.accounts[0]
-      },
-      function (err, res) {
-        if (err) {
-          return console.error(err);;
-        }
-        else {
-          callback(res.c[0])
-        }
-    });
   }
 
   let updateAllBalances = async function() {
@@ -165,69 +161,60 @@ function startApp(web3js) {
   let updateMyBalance = function() {
     getBalance(web3js.eth.accounts[0]).then(function(balance) {
       console.log('in updateMyBalance = ' + balance)
-      $('#token_count').text(balance);
+      $('#token_count').text(parseFloat(balance).toPrecision(3));
     });
   }
 
   // Calculate locally based on the last_claimed time.
   // Calling the checkEntitlement function returns inconsistent values.
   let updateMyEntitlement = function() {
-    contract.last_claimed.call(web3js.eth.accounts[0],
+    redemptionFunctional.getLastClaimed(
+      {'from':web3js.eth.accounts[0]},
+      function(err, res) {
+        if (err) {
+          return console.error(err);;
+        } else {
+          let last_claimed = res.c[0];
+          console.log(`last_claimed: ${last_claimed}`);
+
+          let now = Math.floor(Date.now() / 1000);
+          // if this is user's first claim
+          if (now < last_claimed + 86400 ) {
+            console.log("Claimed too recently")
+            $('#token_entitlement').text(0);
+          } else {
+            redemptionFunctional.checkEntitlement(
+              {'from':web3js.eth.accounts[0]},
+              function(err, entitlement) {
+                entitlement = web3.fromWei(entitlement, 'ether');
+                console.log(`entitlement = ${entitlement}`);
+                $('#token_entitlement').text(parseFloat(entitlement).toPrecision(7));
+              }
+            )
+          }
+        }
+      }
+    );
+  }
+
+  let showHideWhitelist = function() {
+    $('.whitelisted-only').hide()
+    redemptionFunctional.checkWhiteListStatus({
+      'from':web3js.eth.accounts[0]
+      },
       function (err, res) {
         if (err) {
           return console.error(err);;
         }
         else {
-          let last_claimed = res.c[0];
-          console.log('in updateMyEntitlement, last claimed = ' + last_claimed);
-
-          // if this is user's first claim
-          if (last_claimed == 0 ) {
-            console.log('no previous claims')
-            $('#token_entitlement').text(10);
+          if (res) {
+            $('.whitelisted-only').show()
+            $('.not-whitelisted').hide()
           }
-          else {
-            getMintingCoefficient(function (coefficient) {
-              let entitlement = Math.round(coefficient * ((Date.now() / 1000) - last_claimed));
-              console.log("res =" )
-              console.log(res)
-              console.log('Date.now() / 1000 =' + (Date.now() / 1000))
 
-              console.log('minting_coefficient =' + coefficient)
-              console.log('entitlement =' + entitlement)
-              $('#token_entitlement').text(entitlement);
-            })
-          }
         }
     });
   }
-
-  let updateMintingCoefficient = function() {
-    getMintingCoefficient(function (coefficient) {
-        $('.coefficient').attr("placeholder", coefficient);
-    })
-  }
-
-  $('.set').on('click', function () {
-    let coefficient = parseInt($('.coefficient').val());
-
-    if (!Number.isInteger(coefficient)) {
-      console.error('Minting coefficient is not a number')
-      return
-    }
-    else {
-      console.log("setting minting coefficient to " + coefficient)
-      contract.setMintingCoefficient(coefficient, {
-        'from':web3js.eth.accounts[0]
-        },
-        function (err, transactionHash) {
-          console.log(err, transactionHash);
-          return web3.eth.getTransactionReceiptMined(transactionHash, 5000).then(function (receipt) {
-            console.log('minting coefficient set')
-          });
-      });
-    }
-  });
 
   $('.update').on('click', function () {
     updateMyBalance();
@@ -235,7 +222,7 @@ function startApp(web3js) {
   });
 
   $('.claim').on('click', function () {
-    contract.withdrawTokens({
+    redemptionFunctional.claimTokens({
       'from':web3js.eth.accounts[0]
     },
     function (err, transactionHash) {
@@ -250,9 +237,77 @@ function startApp(web3js) {
     });
   });
 
+  $('.whitelist').on('click', function () {
+    let account = $('.wl-account').val();
+    console.log(account);
+    redemptionFunctional.whiteListUser(
+      account,
+      {'from':web3js.eth.accounts[0]},
+      function (err, transactionHash) {
+        console.log(err, transactionHash);
+      }
+    );
+  });
+
+  $('.check-price-buy').on('click', function() {
+    let amount = $('.buy-amount').val();
+    amount = web3.toWei(amount, "ether");
+    console.log(`amount: ${amount}`);
+
+    goodCoinMarket.calculateAmountPurchased(
+      amount,
+      function(err, tokens){
+        tokens = web3.fromWei(tokens, 'ether');
+        console.log(`tokens: ${tokens}`);
+        $('#buy_price').text(parseFloat(tokens).toPrecision(7));
+      }
+    );
+  });
+
+  $('.check-price-sell').on('click', function() {
+    let amount = $('.sell-amount').val();
+    amount = web3.toWei(amount, "ether");
+
+    goodCoinMarket.calculatePriceForSale(
+      amount,
+      function(err, tokens){
+        tokens = web3.fromWei(tokens, 'ether');
+        console.log(`tokens: ${tokens}`);
+        $('#sell_price').text(parseFloat(tokens).toPrecision(7));
+      }
+    );
+  });
+
+  $('.buy').on('click', function() {
+    let amount = $('.buy-amount').val();
+    amount = web3.toWei(amount, "ether");
+
+    goodCoinMarket.buy(
+      {
+        'from':web3js.eth.accounts[0],
+        'value': amount
+      },
+      function(err, transactionHash){
+        console.log(err,transactionHash);
+      }
+    );
+  });
+
+
+  $('.sell').on('click', function() {
+    let amount = $('.sell-amount').val();
+    amount = web3.toWei(amount, "ether");
+    goodCoinMarket.sell(
+      amount,
+      {'from':web3js.eth.accounts[0]},
+      function(err, transactionHash){
+        console.log(err,transactionHash);
+      }
+    );
+  });
   updateMyBalance();
   updateMyEntitlement();
-  updateMintingCoefficient();
   updateAllBalances();
+  showHideWhitelist();
   $('#eth_address').text(web3js.eth.accounts[0]);
 }

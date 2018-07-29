@@ -1,0 +1,93 @@
+pragma solidity ^0.4.24;
+
+import 'zeppelin-solidity/contracts/math/SafeMath.sol';
+import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
+
+import './BancorFormula.sol';
+import './GoodCoin.sol';
+
+contract GoodCoinMarket is Ownable {
+    using SafeMath for uint256;
+
+    GoodCoin public token;
+    BancorFormula public formula;
+
+    // Reserve ratio, represented in value between
+    // 1 and 1,000,000. So 0.1 = 100000.
+    uint32 public reserveRatio = 100000;
+
+    uint256 public inflationRate = 1;
+
+    constructor(address _token, address _formula) public payable {
+        token = GoodCoin(_token);
+        formula = BancorFormula(_formula);
+    }
+
+    function poolBalance() private view returns(uint256) {
+        return address(this).balance;
+    }
+
+    function calculateAmountPurchased(uint256 _eth) public view returns(uint256) {
+        uint256 tokensForPrice = formula.calculatePurchaseReturn(
+            totalSupply(),
+            poolBalance(),
+            reserveRatio,
+            _eth
+        );
+
+        return tokensForPrice;
+    }
+
+    function calculatePriceForSale(uint256 _sellAmount) public view returns(uint256) {
+        uint256 ethAmount = formula.calculateSaleReturn(
+            totalSupply(),
+            poolBalance(),
+            reserveRatio,
+            _sellAmount
+        );
+
+        return ethAmount;
+    }
+
+    function buy() public payable returns(bool) {
+        require(msg.value > 0);
+        uint256 tokensToMint = formula.calculatePurchaseReturn(
+            totalSupply(),
+            poolBalance(),
+            reserveRatio,
+            msg.value
+        );
+        token.withdrawTokens(msg.sender, tokensToMint);
+
+        return true;
+    }
+
+    function sell(uint256 _sellAmount) public returns(bool){
+        require(_sellAmount > 0 && token.balanceOf(msg.sender) >= _sellAmount);
+        uint256 ethAmount = formula.calculateSaleReturn(
+            totalSupply(),
+            poolBalance(),
+            reserveRatio,
+            _sellAmount
+        );
+
+        token.burnTokens(msg.sender, _sellAmount);
+        msg.sender.transfer(ethAmount);
+
+        return true;
+    }
+
+    function totalSupply() public view returns (uint256) {
+        return token.totalSupply();
+    }
+
+    function withdrawTokens(
+        address _account,
+        uint256 _amount
+    ) onlyOwner public returns (bool) {
+        token.withdrawTokens(_account, _amount);
+
+        return true;
+    }
+}
+

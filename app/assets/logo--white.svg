@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="132px" height="21px" viewBox="0 0 132 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50 (54983) - http://www.bohemiancoding.com/sketch -->
+    <title>logo</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" font-family="FreightSansProLight-Regular, FreightSans Pro" font-size="28" font-weight="300">
+        <g id="V4---GoodDollar-Mockup-Copy-3" transform="translate(-251.000000, -23.000000)" fill="#FFFFFF">
+            <g id="logo" transform="translate(250.000000, 14.500000)">
+                <text id="GoodDollar">
+                    <tspan x="0" y="24.5">Good</tspan>
+                    <tspan x="61.04" y="24.5" font-family="FreightSansProSemibold-Regular, FreightSans Pro" font-weight="500">Dollar</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>
