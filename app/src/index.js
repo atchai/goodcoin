@@ -10,6 +10,8 @@ let test_accounts = undefined
 let redemption_functional_address = undefined
 let goodCoinMarketAddress = undefined
 let urlParams = new URLSearchParams(window.location.search);
+let goodCoinMarketAddressFile = require('../../build/contracts/GoodCoinMarket.json');
+let goodCoinAddressFile = require('../../build/contracts/GoodCoin.json');
 
 // production
 if (window.location.hostname == 'goodcoin.atchai.com' || urlParams.has('prod')) {
@@ -29,11 +31,14 @@ if (window.location.hostname == 'goodcoin.atchai.com' || urlParams.has('prod')) 
 // dev
 else {
   console.log('dev');
-  contract_address = '0x891fa156f57882183f39d3a15248b9c8548f3661';  //dev
-  redemption_functional_address = '0x171f2b180518453765956b6c9d765937aeb381d3';
-  goodCoinMarketAddress = '0x3667a26971356491346cfde5f7793843182d66c3';
+  
   network_id = 6000 // ganache - ethereum network ID
-  owner_account = '0xc72B61B7C4e343beF326D24b905edb09d54B00B6';
+  // contract_address = '0xc61d5402e3885f9a4ac8fb410d1b747235f8a149';  //dev
+  redemption_functional_address = '0x171f2b180518453765956b6c9d765937aeb381d3';
+  contract_address = goodCoinAddressFile.networks[network_id].address; // 'truffle migrate'changes the address everytime
+  goodCoinMarketAddress = goodCoinMarketAddressFile.networks[network_id].address; // 'truffle migrate'changes the address everytime
+  
+  owner_account = '0x22e614563e6779e8848d00d8c211f044734fa5aa';
   test_accounts = [ '0xb3D1d7D38971245724cEb71e65BE54BC44083a3a',
                     '0xf4444B538b14bcA7962dBFF264F92e4dCc3a005A',
                     '0xc5656A71C0B909D3BaB72906dCE3817b34c90748',
