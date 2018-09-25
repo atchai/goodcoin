@@ -33,6 +33,7 @@ module.exports = function(deployer,network,accounts) {
             "RedemptionFunctional": RedemptionFunctional.address
         }
 
+        console.log(process.deployment);
         await releaser(process.deployment, network);
     });
 };

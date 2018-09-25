@@ -1,9 +1,9 @@
 // Expects web3 to be v.0.2
-
+import 'babel-polyfill'; // required *exactly here* to avoid this error: "ReferenceError: regeneratorRuntime is not defined" // see: https://github.com/babel/babel/issues/5085
 import $ from 'jquery';
 var Web3 = require('web3')
 
-let contract_address = undefined
+let goodDollar_contract_address = undefined
 let network_id = undefined
 let owner_account = undefined
 let test_accounts = undefined
@@ -12,11 +12,13 @@ let goodCoinMarketAddress = undefined
 let urlParams = new URLSearchParams(window.location.search);
 let goodCoinMarketAddressFile = require('../../build/contracts/GoodCoinMarket.json');
 let goodCoinAddressFile = require('../../build/contracts/GoodCoin.json');
+let redemptionFunctionalAddressFile = require('../../build/contracts/RedemptionFunctional.json');
+let ehteriumAccounts = undefined;
 
-// production
+// dev production
 if (window.location.hostname == 'goodcoin.atchai.com' || urlParams.has('prod')) {
   console.log('production')
-  contract_address = '0x495bf815fd7b065d8ab491ff4cc18b9bb472e04a';  //ropsten
+  goodDollar_contract_address = '0x495bf815fd7b065d8ab491ff4cc18b9bb472e04a';  //ropsten
   redemption_functional_address = '0xef672c34abc762590f18e6f9fb26739acf0f9da5';
   goodCoinMarketAddress = '0x27cc97cc4a32d6dd6c62864c0956a3d2f1144d53';
   network_id = 3 // ropsten - ethereum network ID
@@ -33,18 +35,28 @@ else {
   console.log('dev');
   
   network_id = 6000 // ganache - ethereum network ID
-  // contract_address = '0xc61d5402e3885f9a4ac8fb410d1b747235f8a149';  //dev
-  redemption_functional_address = '0x171f2b180518453765956b6c9d765937aeb381d3';
-  contract_address = goodCoinAddressFile.networks[network_id].address; // 'truffle migrate'changes the address everytime
+  redemption_functional_address = redemptionFunctionalAddressFile.networks[network_id].address; // 'truffle migrate'changes the address everytime
+  goodDollar_contract_address = goodCoinAddressFile.networks[network_id].address; // 'truffle migrate'changes the address everytime
   goodCoinMarketAddress = goodCoinMarketAddressFile.networks[network_id].address; // 'truffle migrate'changes the address everytime
   
-  owner_account = '0x22e614563e6779e8848d00d8c211f044734fa5aa';
+  /*owner_account = '0x22e614563e6779e8848d00d8c211f044734fa5aa';
   test_accounts = [ '0xb3D1d7D38971245724cEb71e65BE54BC44083a3a',
                     '0xf4444B538b14bcA7962dBFF264F92e4dCc3a005A',
                     '0xc5656A71C0B909D3BaB72906dCE3817b34c90748',
                     '0xE3330d9b3fd657c9590BbDCceBC2dC023e651b1F',
-                    '0x19532cE3e0dCc9e4360d27f696b5b72E84bc6937'];
+                    '0x19532cE3e0dCc9e4360d27f696b5b72E84bc6937'];*/
+
+                    
 }
+
+owner_account = '0x9b36dEa68d42668Bed85c91b990BD306a18310C6';
+  test_accounts = [ '0x497726e13713f468D7fE7b5127EAD4baB81d2807',
+                    '0x3f266ACE11E6bA86095d1b50484aA49eb98dF52F',
+                    '0x883A201c9d5f15026572Ca823a93c07d6dCD39aD',
+                    '0xA2bEdfc13889Da52D2e632F4036C74aCDbFF5a7f',
+                    '0x09DA63c14BC36eBeb0834CabcA0676353A08b5EB'];
+
+
 
 const abi = require('./abi.js');
 const gcmAbi = require('./gcm_abi.js');
@@ -53,12 +65,13 @@ const redemptionAbi = require('./redemption_abi.js');
 // Check for Metamask and show/hide appropriate warnings.
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+  
   if ((typeof web3 !== 'undefined') && (web3.givenProvider !== null)) {
     var web3js = new Web3(web3.currentProvider);
-
+    
     // Checking if user is logged into an account
     web3js.eth.getAccounts(function(err, accounts){
-        if (err != null) console.error("An error occurred: "+err);
+        if (err != null) console.error("An error occurred: " + err);
 
         // User is not logged into Metamask
         else if (accounts.length == 0) {
@@ -68,7 +81,9 @@ window.addEventListener('load', function() {
 
         // User is logged in to Metamask
         else {
-          web3js.version.getNetwork((err, net_id) => {
+          ehteriumAccounts = accounts;
+
+          web3js.eth.net.getId((err, net_id) => {
             console.log(net_id);
             if (err != null) console.error("An error occurred: "+err);
 
@@ -79,7 +94,7 @@ window.addEventListener('load', function() {
               $('#main-content').show();
 
               // show admin content if we are the contract owner
-              if (web3.eth.accounts[0].toLowerCase() == owner_account.toLowerCase()) {
+              if (accounts[0].toLowerCase() == owner_account.toLowerCase()) {
                 $('#admin-content').show();
               }
               startApp(web3js);
@@ -103,11 +118,39 @@ window.addEventListener('load', function() {
 
 
 function startApp(web3js) {
-  var contract = web3js.eth.contract(abi).at(contract_address);
-  var redemptionFunctional = web3js.eth.contract(redemptionAbi).at(redemption_functional_address);
-  var goodCoinMarket = web3js.eth.contract(gcmAbi).at(goodCoinMarketAddress);
-
-  web3.eth.getTransactionReceiptMined = function getTransactionReceiptMined(txHash, interval) {
+  var contract = new web3js.eth.Contract(abi,goodDollar_contract_address);
+  var redemptionFunctional = new web3js.eth.Contract(redemptionAbi,redemption_functional_address);
+  var goodCoinMarket = new web3js.eth.Contract(gcmAbi,goodCoinMarketAddress);
+  debugger;
+  /*redemptionFunctional.events.ClaimCalculated()
+  .on('data', function(event){
+    debugger;
+    console.log(event); // same results as the optional callback above
+})
+.on('changed', function(event){
+    // remove event from local database
+})
+.on('error', console.error);*/
+  /*
+  goodCoinMarket.events.allEvents({
+    
+  }, function(error, event){ 
+    alert("event raised");
+    if (error!=undefined)
+      console.error(error);
+    else
+      console.log(event);
+   })
+  .on('data', function(event){
+      console.log(event); // same results as the optional callback above
+  })
+  .on('changed', function(event){
+      // remove event from local database
+  })
+  .on('error', console.error);
+  
+*/
+  web3js.eth.getTransactionReceiptMined = function getTransactionReceiptMined(txHash, interval) {
       const self = this;
       const transactionReceiptAsync = function(resolve, reject) {
           self.getTransactionReceipt(txHash, (error, receipt) => {
@@ -135,14 +178,15 @@ function startApp(web3js) {
 
   let getBalance = function(account) {
     return new Promise(function(resolve, reject) {
-      contract.balanceOf(account,
+      contract.methods.balanceOf.call(account,
         function (err, res) {
+          debugger;
           if (err) {
             console.error(err);
             reject(err);
           }
           else {
-            resolve(web3.fromWei(res));
+            resolve(web3js.utils.fromWei(res));
           }
       });
     })
@@ -164,7 +208,7 @@ function startApp(web3js) {
   }
 
   let updateMyBalance = function() {
-    getBalance(web3js.eth.accounts[0]).then(function(balance) {
+    getBalance(ehteriumAccounts[0]).then(function(balance) {
       console.log('in updateMyBalance = ' + balance)
       $('#token_count').text(parseFloat(balance).toPrecision(3));
     });
@@ -173,13 +217,13 @@ function startApp(web3js) {
   // Calculate locally based on the last_claimed time.
   // Calling the checkEntitlement function returns inconsistent values.
   let updateMyEntitlement = function() {
-    redemptionFunctional.getLastClaimed(
-      {'from':web3js.eth.accounts[0]},
+    redemptionFunctional.methods.getLastClaimed().call(
+      {'from':ehteriumAccounts[0]},
       function(err, res) {
         if (err) {
           return console.error(err);;
         } else {
-          let last_claimed = res.c[0];
+          let last_claimed = res;
           console.log(`last_claimed: ${last_claimed}`);
 
           let now = Math.floor(Date.now() / 1000);
@@ -188,10 +232,10 @@ function startApp(web3js) {
             console.log("Claimed too recently")
             $('#token_entitlement').text(0);
           } else {
-            redemptionFunctional.checkEntitlement(
-              {'from':web3js.eth.accounts[0]},
+            redemptionFunctional.methods.checkEntitlement().call(
+              {'from':ehteriumAccounts[0]},
               function(err, entitlement) {
-                entitlement = web3.fromWei(entitlement, 'ether');
+                entitlement = web3js.utils.fromWei(entitlement, 'ether');
                 console.log(`entitlement = ${entitlement}`);
                 $('#token_entitlement').text(parseFloat(entitlement).toPrecision(7));
               }
@@ -204,8 +248,8 @@ function startApp(web3js) {
 
   let showHideWhitelist = function() {
     $('.whitelisted-only').hide()
-    redemptionFunctional.checkWhiteListStatus({
-      'from':web3js.eth.accounts[0]
+    redemptionFunctional.methods.checkWhiteListStatus().call({
+      'from':ehteriumAccounts[0]
       },
       function (err, res) {
         if (err) {
@@ -227,12 +271,12 @@ function startApp(web3js) {
   });
 
   $('.claim').on('click', function () {
-    redemptionFunctional.claimTokens({
-      'from':web3js.eth.accounts[0]
+    redemptionFunctional.methods.claimTokens().call({
+      'from':ehteriumAccounts[0]
     },
     function (err, transactionHash) {
         console.log(err, transactionHash);
-        return web3.eth.getTransactionReceiptMined(transactionHash, 5000).then(function (receipt) {
+        return web3js.eth.getTransactionReceiptMined(transactionHash, 5000).then(function (receipt) {
           // wait 3 seconds to update balance as it will not have updated if we call immediately
           setTimeout(function(){
             updateMyBalance();
@@ -245,9 +289,9 @@ function startApp(web3js) {
   $('.whitelist').on('click', function () {
     let account = $('.wl-account').val();
     console.log(account);
-    redemptionFunctional.whiteListUser(
-      account,
-      {'from':web3js.eth.accounts[0]},
+    redemptionFunctional.methods.whiteListUser(
+      account).call(
+      {'from':ehteriumAccounts[0]},
       function (err, transactionHash) {
         console.log(err, transactionHash);
       }
@@ -256,13 +300,14 @@ function startApp(web3js) {
 
   $('.check-price-buy').on('click', function() {
     let amount = $('.buy-amount').val();
-    amount = web3.toWei(amount, "ether");
+    amount = web3js.utils.toWei(amount, "ether");
     console.log(`amount: ${amount}`);
 
-    goodCoinMarket.calculateAmountPurchased(
-      amount,
+    goodCoinMarket.methods.calculateAmountPurchased(
+      amount).call(
       function(err, tokens){
-        tokens = web3.fromWei(tokens, 'ether');
+        tokens = web3js.fromWei(tokens, 'ether');
+        console.log(`tokens before: ${tokens}`);
         console.log(`tokens: ${tokens}`);
         $('#buy_price').text(parseFloat(tokens).toPrecision(7));
       }
@@ -271,12 +316,12 @@ function startApp(web3js) {
 
   $('.check-price-sell').on('click', function() {
     let amount = $('.sell-amount').val();
-    amount = web3.toWei(amount, "ether");
+    amount = web3js.utils.toWei(amount, "ether");
 
-    goodCoinMarket.calculatePriceForSale(
-      amount,
+    goodCoinMarket.methods.calculatePriceForSale(
+      amount).call(
       function(err, tokens){
-        tokens = web3.fromWei(tokens, 'ether');
+        tokens = web3js.utils.fromWei(tokens, 'ether');
         console.log(`tokens: ${tokens}`);
         $('#sell_price').text(parseFloat(tokens).toPrecision(7));
       }
@@ -285,11 +330,11 @@ function startApp(web3js) {
 
   $('.buy').on('click', function() {
     let amount = $('.buy-amount').val();
-    amount = web3.toWei(amount, "ether");
+    amount = web3js.toWei(amount, "ether");
 
-    goodCoinMarket.buy(
+    goodCoinMarket.methods.buy().call(
       {
-        'from':web3js.eth.accounts[0],
+        'from':ehteriumAccounts[0],
         'value': amount
       },
       function(err, transactionHash){
@@ -301,18 +346,24 @@ function startApp(web3js) {
 
   $('.sell').on('click', function() {
     let amount = $('.sell-amount').val();
-    amount = web3.toWei(amount, "ether");
-    goodCoinMarket.sell(
-      amount,
-      {'from':web3js.eth.accounts[0]},
+    amount = web3js.utils.toWei(amount, "ether");
+    goodCoinMarket.methods.sell(
+      amount).call(
+      {'from':ehteriumAccounts[0]},
       function(err, transactionHash){
         console.log(err,transactionHash);
       }
     );
   });
+  
+  debugger;
   updateMyBalance();
+  debugger;
   updateMyEntitlement();
+  debugger;
   updateAllBalances();
+  debugger;
   showHideWhitelist();
-  $('#eth_address').text(web3js.eth.accounts[0]);
+  debugger;
+  $('#eth_address').text(ehteriumAccounts[0]);
 }

@@ -90,4 +90,3 @@ contract GoodCoinMarket is Ownable {
         return true;
     }
 }
-

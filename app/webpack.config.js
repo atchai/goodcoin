@@ -12,9 +12,13 @@ module.exports = {
   devServer: {
     hot: true,
     watchContentBase: true,
-    
-    historyApiFallback: true
+    historyApiFallback: true,
+    publicPath:'/app/assets/',
 
+  },
+  watchOptions: {
+    aggregateTimeout: 600,
+    poll: true
   },
   module: {
    
@@ -24,7 +28,9 @@ module.exports = {
         exclude: /(node_modules)/,
         use: {
           loader: 'babel-loader',
-         
+          options: {
+            presets: ['es2015']
+            }
         }
       },
       {
