@@ -1,12 +1,13 @@
 {
   "presets": [
-    "env"
+    
+    "babel-preset-env"
 ],
 "sourceMaps": true,
 "retainLines": true,
   
   
   "plugins": [
-    "transform-decorators-legacy"
+    "transform-object-rest-spread"
   ]
 }

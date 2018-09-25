@@ -12,6 +12,8 @@ contract RedemptionFunctional is Ownable {
     RedemptionData public data;
     GoodCoinMarket public market;
 
+    event ClaimCalculated(uint256 base, uint256 interest, uint256 total);
+
     modifier whiteListed() {
         bool check = data.checkUser(msg.sender);
         require(check);
@@ -48,6 +50,7 @@ contract RedemptionFunctional is Ownable {
         // in the earlier calculation.
         total = total.sub(market.totalSupply());
         uint256 amount = total.div(data.whiteListedUserCount());
+        //emit ClaimCalculated(base,interest,total);
         return amount;
     }
 

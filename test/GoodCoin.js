@@ -7,6 +7,7 @@ const GoodCoin = artifacts.require("GoodCoin");
 contract("GoodCoin", accounts => {
   it("Should make first account an owner", async () => {
     let instance = await GoodCoin.deployed();
+    debugger;
     let owner = await instance.owner();
     assert.equal(owner, accounts[0]);
   });

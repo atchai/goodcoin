@@ -17,16 +17,22 @@ module.exports = {
   // to customize your Truffle configuration!
 
   networks: {
-    'development': {
+    'truffle_develop': {
       host: "127.0.0.1",
-      port: 7545,
-      network_id: "*" // Match any network id
+      port: 9545, // "truffle develop" runs on 9454
+      network_id: "4447", // Match any network id
+      //from: '0x6209AB800b18F27c1981b05C6aDAdDe30A4Fccd2' // should be equal to first address in ganache UI list - address[0]
+
     },
-    'ganache': {
+
+    'ganache_develop': {
       host: "127.0.0.1",
-      port: 8545,
-      network_id: "6000" // Match any network id
+      port: 8545, // my "ganache " runs on 7545 - configurable
+      network_id: "6000", // my "ganache " runs with 6000 network_id - configurable
+      from: '0x9b36dEa68d42668Bed85c91b990BD306a18310C6' // should be equal to first address in ganache UI list - address[0]
+
     },
+   
     ropstengeth: {
      host: "127.0.0.1",
      port: 8545,
