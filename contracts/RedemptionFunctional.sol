@@ -68,6 +68,8 @@ contract RedemptionFunctional is Ownable {
      * @return Number of tokens you are entitled to
      */
     function checkEntitlement() public whiteListed view returns(uint) {
+        if(data.getLastClaimed(msg.sender) + 1 days > now)
+          return 0;
         return calculateClaim();
     }
 }
