@@ -1,20 +1,25 @@
 import assertRevert from "zeppelin-solidity/test/helpers/assertRevert";
 
 const GoodCoin = artifacts.require("GoodCoin");
+const GoodCoinMarket = artifacts.require("GoodCoinMarket");
+const RedemptionFunctional = artifacts.require("RedemptionFunctional");
 
 // TODO integrate tests from https://github.com/ConsenSys/Tokens/blob/master/test/eip20/eip20.js
 
 contract("GoodCoin", accounts => {
   it("Should make first account an owner", async () => {
     let instance = await GoodCoin.deployed();
-    debugger;
-    let owner = await instance.owner();
+    let instanceRedemptionFunctional = await RedemptionFunctional.deployed();
+    let owner = await instanceRedemptionFunctional.owner();
+    console.log(owner,accounts);
     assert.equal(owner, accounts[0]);
+    
   });
 
   it("Should give the owner 12000 tokens", async () => {
     let instance = await GoodCoin.deployed();
-    let owner = await instance.owner();
+    let instanceRedemptionFunctional = await RedemptionFunctional.deployed();
+    let owner = await instanceRedemptionFunctional.owner();
     let balance = (await instance.balanceOf.call(accounts[0])).toNumber();
 
     assert.equal(balance, 12000);
@@ -29,7 +34,8 @@ contract("GoodCoin", accounts => {
 
   it("Should entitle a first-time users to 10 tokens", async () => {
     let instance = await GoodCoin.deployed();
-    let owner = await instance.owner();
+    let instanceRedemptionFunctional = await RedemptionFunctional.deployed();
+    let owner = await instanceRedemptionFunctional.owner();
     let entitlement = (await instance.checkEntitlement.call(accounts[1])).toNumber();
 
     assert.equal(entitlement, 10);
