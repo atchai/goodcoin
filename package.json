@@ -9,11 +9,12 @@
   "scripts": {
     "test": "truffle test --inspect-brk  --compilers js:babel-core/register test/GoodCoin.js",
     "start:node": "start node app/server.js",
-    "start:dev": "start http://localhost:3001/app/index.html &webpack-dev-server --mode development  --config ./app/webpack.config.js --port 3001 --hot --inline",
+    "migrate:ganache":"truffle migrate --network ganache_develop",
+    "migrate_reset:ganache":"truffle migrate --network ganache_develop --reset",
+    "start:dev": "start http://localhost:3001/app/index.html &webpack-dev-server --mode development  --config ./app/webpack.config.js --port 3001 --hot --inline --inspect=9001",
     "build:dev": "webpack --mode development ./app/src/index.js --output ./app/dist/bundle.js",
     "build:prd": "webpack --mode production ./app/src/index.js --output ./app/dist/bundle.js",
     "watch": "webpack --watch"
-
   },
   "dependencies": {
     "dotenv": "^6.0.0",
@@ -39,7 +40,7 @@
     "style-loader": "^0.23.0",
     "truffle": "4.1.11",
     "truffle-privatekey-provider": "^0.1.0",
-    "webpack": "^4.19.0",
+    "webpack": "^4.19.1",
     "webpack-cli": "^2.1.5",
     "webpack-dev-server": "^3.1.8"
   }

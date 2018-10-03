@@ -31,10 +31,16 @@ contract GoodCoin is StandardToken, Ownable {
       _;
     }
 
+    // Creats initial amount of this coin (GoodCoin) in the market
+    // Amount is 100 coins for a start (of the GoodCoin market)
     function initialMove(address _gcm) canMint canPopulate public onlyOwner returns(bool) {
       // amount is 100 * 10^18 as each token seems to be viewed as
       // a wei-like equivalent in the bancor formulas
-      uint256 amount = 100000000000000000000;
+      
+      // should be: uint256 amount = 100*(10**decimals);
+      // replace "18" in the number of decimals. 
+      //Don't replace in decimals var itself; it is uint8 and wiil cause inaccuracy. Should not change to uint256 also.
+      uint256 amount = 100*(10**18); // ** is math.power
 
       mint(_gcm, amount);
 
@@ -45,9 +51,11 @@ contract GoodCoin is StandardToken, Ownable {
     }
 
     constructor() public {
+
       totalSupply_ = INITIAL_SUPPLY;
     }
 
+    // How many goodCoins exists in the "world"
     function totalSupply() public view returns(uint256) {
       return totalSupply_;
     }
@@ -59,8 +67,8 @@ contract GoodCoin is StandardToken, Ownable {
    * @return A boolean that indicates if the operation was successful.
    */
   function mint(address _to, uint256 _amount) canMint private returns (bool) {
-    totalSupply_ = totalSupply_.add(_amount);
-    balances[_to] = balances[_to].add(_amount);
+    totalSupply_ = totalSupply_.add(_amount); // When a coin is minted, the totalSupply of all coins increased.
+    balances[_to] = balances[_to].add(_amount); // Transfer the new coin(s) to the desired address
     emit Mint(_to, _amount);
     emit Transfer(address(0), _to, _amount);
     return true;

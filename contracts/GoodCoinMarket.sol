@@ -12,6 +12,11 @@ contract GoodCoinMarket is Ownable {
     GoodCoin public token;
     BancorFormula public formula;
 
+    // Members
+    // =======
+    // totalSupply(): The GoodDollar (GTC coins) amount the contract supervise (the whole GTC coins ever exists are documented here). Initiated on "InitialMove()"
+    // poolBalance(): The ethers (ETH coins) amount the GoodCoinMarket has. Initiated in the deployment of the contract.
+
     // Reserve ratio, represented in value between
     // 1 and 1,000,000. So 0.1 = 100000.
     uint32 public reserveRatio = 100000;
@@ -23,6 +28,7 @@ contract GoodCoinMarket is Ownable {
         formula = BancorFormula(_formula);
     }
 
+    // The etherium amount the GoodCoinMarket has. Initiated in the deployment of the contract.
     function poolBalance() private view returns(uint256) {
         return address(this).balance;
     }

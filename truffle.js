@@ -3,7 +3,7 @@ require("babel-register")({
 });
 require("babel-polyfill");
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production') { // https://codeburst.io/process-env-what-it-is-and-why-when-how-to-use-it-effectively-505d0b2831e7
   require('dotenv').load();
 }
 const HDWalletProvider = require("truffle-hdwallet-provider");
@@ -27,7 +27,7 @@ module.exports = {
 
     'ganache_develop': {
       host: "127.0.0.1",
-      port: 8545, // my "ganache " runs on 7545 - configurable
+      port: 8545, // my "ganache " runs on 8545 - configurable
       network_id: "6000", // my "ganache " runs with 6000 network_id - configurable
       from: '0x9b36dEa68d42668Bed85c91b990BD306a18310C6' // should be equal to first address in ganache UI list - address[0]
 
@@ -35,7 +35,7 @@ module.exports = {
 
     test: {
       host: "127.0.0.1",
-      port: 8545, // my "ganache " runs on 7545 - configurable
+      port: 8545, // my "ganache " runs on 8545 - configurable
       network_id: "6000", // my "ganache " runs with 6000 network_id - configurable
       from: '0x9b36dEa68d42668Bed85c91b990BD306a18310C6' // should be equal to first address in ganache UI list - address[0]
     },

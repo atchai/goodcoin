@@ -2,6 +2,7 @@
 import 'babel-polyfill'; // required *exactly here* to avoid this error: "ReferenceError: regeneratorRuntime is not defined" // see: https://github.com/babel/babel/issues/5085
 import $ from 'jquery';
 var Web3 = require('web3')
+var Actions = require('./Actions')
 
 let goodDollar_contract_address = undefined
 let network_id = undefined
@@ -117,14 +118,14 @@ window.addEventListener('load', function() {
 })
 
 
-function startApp(web3js) {
+function startApp(web3js) { 
   var contract = new web3js.eth.Contract(abi,goodDollar_contract_address);
   var redemptionFunctional = new web3js.eth.Contract(redemptionAbi,redemption_functional_address);
   var goodCoinMarket = new web3js.eth.Contract(gcmAbi,goodCoinMarketAddress);
-  debugger;
+  var actions = new Actions(web3js,goodCoinMarket);
   /*redemptionFunctional.events.ClaimCalculated()
   .on('data', function(event){
-    debugger;
+  
     console.log(event); // same results as the optional callback above
 })
 .on('changed', function(event){
@@ -178,9 +179,8 @@ function startApp(web3js) {
 
   let getBalance = function(account) {
     return new Promise(function(resolve, reject) {
-      contract.methods.balanceOf.call(account,
+      contract.methods.balanceOf(account).call(
         function (err, res) {
-          debugger;
           if (err) {
             console.error(err);
             reject(err);
@@ -189,7 +189,9 @@ function startApp(web3js) {
             resolve(web3js.utils.fromWei(res));
           }
       });
-    })
+    }).catch(console.log)
+
+    
   }
 
   let updateAllBalances = async function() {
@@ -302,16 +304,15 @@ function startApp(web3js) {
     let amount = $('.buy-amount').val();
     amount = web3js.utils.toWei(amount, "ether");
     console.log(`amount: ${amount}`);
-
     goodCoinMarket.methods.calculateAmountPurchased(
-      amount).call(
-      function(err, tokens){
-        tokens = web3js.fromWei(tokens, 'ether');
-        console.log(`tokens before: ${tokens}`);
-        console.log(`tokens: ${tokens}`);
-        $('#buy_price').text(parseFloat(tokens).toPrecision(7));
-      }
-    );
+        amount).call(
+        function(err, tokens){
+          tokens = web3js.utils.fromWei(tokens, 'ether');
+          console.log(`tokens before: ${tokens}`);
+          console.log(`tokens: ${tokens}`);
+          $('#buy_price').text(parseFloat(tokens).toPrecision(7));
+        }
+      );
   });
 
   $('.check-price-sell').on('click', function() {
@@ -340,8 +341,7 @@ function startApp(web3js) {
       function(err, transactionHash){
         console.log(err,transactionHash);
       }
-    );
-  });
+    );});
 
 
   $('.sell').on('click', function() {
@@ -356,14 +356,9 @@ function startApp(web3js) {
     );
   });
   
-  debugger;
   updateMyBalance();
-  debugger;
   updateMyEntitlement();
-  debugger;
   updateAllBalances();
-  debugger;
   showHideWhitelist();
-  debugger;
   $('#eth_address').text(ehteriumAccounts[0]);
 }
