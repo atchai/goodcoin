@@ -59,7 +59,9 @@ contract GoodCoinMarket is Ownable {
         require(msg.value > 0);
         uint256 tokensToMint = formula.calculatePurchaseReturn(
             totalSupply(),
-            poolBalance(),
+            //when purchasing with eth the poolbalance is changed before this calculation
+            //so we have to consider this
+            poolBalance()-msg.value,
             reserveRatio,
             msg.value
         );
