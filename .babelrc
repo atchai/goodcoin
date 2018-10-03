@@ -1,3 +1,13 @@
 {
-  "presets": ["env"]
+  "presets": [
+    
+    "babel-preset-env"
+],
+"sourceMaps": true,
+"retainLines": true,
+  
+  
+  "plugins": [
+    "transform-object-rest-spread"
+  ]
 }

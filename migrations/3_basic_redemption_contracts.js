@@ -1,5 +1,5 @@
 'use strict';
-
+ 
 var BancorFormula = artifacts.require("BancorFormula");
 var ExpArray = artifacts.require("ExpArray");
 var GoodCoin = artifacts.require("GoodCoin");
@@ -14,10 +14,18 @@ module.exports = function(deployer,network,accounts) {
         await deployer.deploy(RedemptionData);
         await deployer.deploy(ExpArray);
         await deployer.deploy(BancorFormula, ExpArray.address);
-        await deployer.deploy(GoodCoinMarket, GoodCoin.address, BancorFormula.address, {'value': web3.toWei(10, "ether")});
+        await deployer.deploy(GoodCoinMarket, GoodCoin.address, BancorFormula.address, {'value': web3.toWei(10, "ether")}); // Creating 10 Ethers to the GoodCoin Market.
         await deployer.deploy(RedemptionFunctional, RedemptionData.address, GoodCoinMarket.address);
 
-        (await GoodCoin.deployed()).initialMove(GoodCoinMarket.address);
+        let goodCoin = await GoodCoin.deployed();
+        let totalSupply = 0;
+
+        totalSupply = (await goodCoin.totalSupply.call()).toString(10);
+        console.log("Before initialMove() - GoodCoin totalSupply:",totalSupply);
+        console.log("Initializing amount of GTC in the market.");
+        (await GoodCoin.deployed()).initialMove(GoodCoinMarket.address); // Minting X number of GoodCoins to the GoodCoin market.
+        totalSupply = (await goodCoin.totalSupply.call()).toString(10);
+        console.log("After initialMove() - GoodCoin totalSupply:",totalSupply);
 
         (await GoodCoin.deployed()).transferOwnership(GoodCoinMarket.address);
         (await RedemptionData.deployed()).whiteListUser(owner);
@@ -33,7 +41,9 @@ module.exports = function(deployer,network,accounts) {
             "RedemptionFunctional": RedemptionFunctional.address
         }
 
+       
         await releaser(process.deployment, network);
     });
 };
 
+ 
