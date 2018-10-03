@@ -24,7 +24,7 @@ module.exports = function(deployer,network,accounts) {
         console.log("Before initialMove() - GoodCoin totalSupply:",totalSupply);
         console.log("Initializing amount of GTC in the market.");
         (await GoodCoin.deployed()).initialMove(GoodCoinMarket.address); // Minting X number of GoodCoins to the GoodCoin market.
-        totalSupply = (await goodCoin.totalSupply.call().toString(10));
+        totalSupply = (await goodCoin.totalSupply.call()).toString(10);
         console.log("After initialMove() - GoodCoin totalSupply:",totalSupply);
 
         (await GoodCoin.deployed()).transferOwnership(GoodCoinMarket.address);
