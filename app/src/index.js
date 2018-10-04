@@ -173,9 +173,21 @@ window.addEventListener('load', function() {
           }
       });
     }).catch(console.log)
+  }
+
+    let getEthBalance = function(account) {
+      return new Promise(function(resolve, reject) {
+        web3js.eth.getBalance(account).then(
+          
+          function (res) {
+              resolve(web3js.utils.fromWei(res, 'ether'));
+            
+        });
+      }).catch(console.log)
+    }
 
     
-  }
+  
 
   let updateAllBalances = async function() {
     let balances = [];
@@ -196,6 +208,13 @@ window.addEventListener('load', function() {
     getBalance(ehteriumAccounts[0]).then(function(balance) {
       console.log('in updateMyBalance = ' + balance)
       $('#token_count').text(parseFloat(balance).toPrecision(3));
+    });
+  }
+
+  let updateMyEthBalance = function() {
+    getEthBalance(ehteriumAccounts[0]).then(function(balance) {
+      console.log('in updateMyBalance = ' + balance)
+      $('#eth_token_count').text(parseFloat(balance).toPrecision(3));
     });
   }
 
@@ -252,6 +271,7 @@ window.addEventListener('load', function() {
 
   $('.update').on('click', function () {
     updateMyBalance();
+    updateMyEthBalance();
     updateMyEntitlement();
   });
 
@@ -265,6 +285,7 @@ window.addEventListener('load', function() {
           // wait 3 seconds to update balance as it will not have updated if we call immediately
           setTimeout(function(){
             updateMyBalance();
+            updateMyEthBalance();
             updateMyEntitlement();
           }, 5000);
         });
@@ -329,6 +350,7 @@ window.addEventListener('load', function() {
         else {
           console.log("Transaction to"+ehteriumAccounts[0]+" succeeded?"+isTxSuccess);
           updateMyBalance();
+          updateMyEthBalance();
           }
         
       }
@@ -348,6 +370,8 @@ window.addEventListener('load', function() {
         else {
           console.log("Transaction to"+ehteriumAccounts[0]+" succeeded?"+isTxSuccess);
           updateMyBalance();
+          updateMyEthBalance();
+
           }
         
       }
@@ -366,6 +390,7 @@ window.addEventListener('load', function() {
   eventSubscriber.subscribe(contract, "Mint");
   
   updateMyBalance();
+  updateMyEthBalance();
   updateMyEntitlement();
   updateAllBalances();
   showHideWhitelist();
