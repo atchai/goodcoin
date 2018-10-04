@@ -22,7 +22,7 @@ class EventSubscriber {
                 address: contract.options.address,
                 topics: [eventJsonInterface.signature]
             }, (error, result) => {
-                debugger;
+                
                 if (!error) {
                     const eventObj = this.web3js.eth.abi.decodeLog(
                         eventJsonInterface.inputs,

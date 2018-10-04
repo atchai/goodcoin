@@ -1,10 +1,10 @@
 pragma solidity ^0.4.24;
 
-import 'zeppelin-solidity/contracts/math/SafeMath.sol';
-import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-import './BancorFormula.sol';
-import './GoodCoin.sol';
+import "./BancorFormula.sol";
+import "./GoodCoin.sol";
 
 contract GoodCoinMarket is Ownable {
     using SafeMath for uint256;

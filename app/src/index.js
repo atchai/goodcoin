@@ -293,9 +293,8 @@ window.addEventListener('load', function() {
         function(err, tokens){
           //tokens = web3js.utils.fromWei(tokens, 'ether')*(10**14);
           tokens = actions.fromGDUnits(tokens,'0');
-          console.log(`tokens before: ${tokens}`);
           console.log(`tokens: ${tokens}`);
-          $('#buy_price').text(parseFloat(tokens));
+          $('#buy_price').text(parseFloat(tokens).toPrecision(4));
         }
       );
   });
@@ -317,11 +316,8 @@ window.addEventListener('load', function() {
   $('.buy').on('click', function() {
     let amount = $('.buy-amount').val();
     amount = web3js.utils.toWei(amount, "ether");
-
-    goodCoinMarket.methods.buy({
-      'from':ehteriumAccounts[0],
-      'value': amount
-    }).call(
+ 
+    goodCoinMarket.methods.buy().send(
       {
         'from':ehteriumAccounts[0],
         'value': amount
@@ -332,6 +328,7 @@ window.addEventListener('load', function() {
         }
         else {
           console.log("Transaction to"+ehteriumAccounts[0]+" succeeded?"+isTxSuccess);
+          updateMyBalance();
           }
         
       }
@@ -342,7 +339,7 @@ window.addEventListener('load', function() {
     let amount = $('.sell-amount').val();
     amount = web3js.utils.toWei(amount, "ether");
     goodCoinMarket.methods.sell(
-      amount).call(
+      amount).send(
       {'from':ehteriumAccounts[0]},
       function(err, transactionHash){
         console.log(err,transactionHash);
