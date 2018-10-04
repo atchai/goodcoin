@@ -15,7 +15,7 @@ contract GoodCoinMarket is Ownable {
     // Members
     // =======
     // totalSupply(): The GoodDollar (GTC coins) amount the contract supervise (the whole GTC coins ever exists are documented here). Initiated on "InitialMove()"
-    // poolBalance(): The ethers (ETH coins) amount the GoodCoinMarket has. Initiated in the deployment of the contract.
+    // poolBalance(): The ethers (ETH coins) amount the GoodCoinMarket as a contract has in the accounthas. Initiated in the deployment of the contract.
 
     // Reserve ratio, represented in value between
     // 1 and 1,000,000. So 0.1 = 100000.
@@ -59,7 +59,8 @@ contract GoodCoinMarket is Ownable {
         require(msg.value > 0);
         uint256 tokensToMint = formula.calculatePurchaseReturn(
             totalSupply(),
-            //when purchasing with eth the poolbalance is changed before this calculation
+            // the function is payable. Means the money sent was *already reflected* in the poolBalance! (eth)
+            // But the user requested to buy according to the amount of poolBalance before he/she made the payment and changeed the formula
             //so we have to consider this
             poolBalance()-msg.value,
             reserveRatio,

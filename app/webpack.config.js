@@ -48,7 +48,10 @@ module.exports = {
     "node_modules"]
 
   },
- 
+  node: { // Solves this error: "Can't resolve 'fs' ..." //See: https://github.com/webpack-contrib/css-loader/issues/447
+    fs: 'empty'
+  },
+
   plugins: [
     new webpack.ProvidePlugin({
       $: 'jquery',

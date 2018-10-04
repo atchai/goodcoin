@@ -17,14 +17,14 @@ module.exports = {
   // to customize your Truffle configuration!
 
   networks: {
-    'truffle_develop': {
+    'development': { // used for 'truffle console' command for debugging purpose. https://truffleframework.com/tutorials/debugger-variable-inspection
       host: "127.0.0.1",
-      port: 9545, // "truffle develop" runs on 9454
-      network_id: "4447", // Match any network id
+      port: 8545, // "truffle develop" runs on 8545
+      network_id: "6000", // Match any network id
       from: '0x9b36dEa68d42668Bed85c91b990BD306a18310C6' // should be equal to first address in ganache UI list - address[0]
 
     },
-
+   
     'ganache_develop': {
       host: "127.0.0.1",
       port: 8545, // my "ganache " runs on 8545 - configurable
