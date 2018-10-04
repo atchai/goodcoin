@@ -14,7 +14,10 @@ module.exports = function(deployer,network,accounts) {
         await deployer.deploy(RedemptionData);
         await deployer.deploy(ExpArray);
         await deployer.deploy(BancorFormula, ExpArray.address);
-        await deployer.deploy(GoodCoinMarket, GoodCoin.address, BancorFormula.address, {'value': web3.toWei(10, "ether")}); // Creating 10 Ethers to the GoodCoin Market.
+        
+        // Deploying the GoodCoinMarket and Creating 10 Ethers in it's account from the deployer.
+        await deployer.deploy(GoodCoinMarket, GoodCoin.address, BancorFormula.address, {'value': web3.toWei(10, "ether")}); 
+        
         await deployer.deploy(RedemptionFunctional, RedemptionData.address, GoodCoinMarket.address);
 
         let goodCoin = await GoodCoin.deployed();
@@ -23,7 +26,9 @@ module.exports = function(deployer,network,accounts) {
         totalSupply = (await goodCoin.totalSupply.call()).toString(10);
         console.log("Before initialMove() - GoodCoin totalSupply:",totalSupply);
         console.log("Initializing amount of GTC in the market.");
-        (await GoodCoin.deployed()).initialMove(GoodCoinMarket.address); // Minting X number of GoodCoins to the GoodCoin market.
+        
+        // Minting X number of GoodCoins to the GoodCoin market.
+        (await GoodCoin.deployed()).initialMove(GoodCoinMarket.address); 
         totalSupply = (await goodCoin.totalSupply.call()).toString(10);
         console.log("After initialMove() - GoodCoin totalSupply:",totalSupply);
 

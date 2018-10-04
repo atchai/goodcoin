@@ -3,6 +3,7 @@ import 'babel-polyfill'; // required *exactly here* to avoid this error: "Refere
 import $ from 'jquery';
 var Web3 = require('web3')
 var Actions = require('./Actions')
+var EventSubscriber = require('./EventSubscriber')
 
 let goodDollar_contract_address = undefined
 let network_id = undefined
@@ -68,8 +69,9 @@ window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
   
   if ((typeof web3 !== 'undefined') && (web3.givenProvider !== null)) {
-    var web3js = new Web3(web3.currentProvider);
     
+    var web3js = new Web3(new Web3.providers.WebsocketProvider("ws://localhost:8545"));
+        
     // Checking if user is logged into an account
     web3js.eth.getAccounts(function(err, accounts){
         if (err != null) console.error("An error occurred: " + err);
@@ -118,39 +120,19 @@ window.addEventListener('load', function() {
 })
 
 
-function startApp(web3js) { 
+ function startApp(web3js) { 
   var contract = new web3js.eth.Contract(abi,goodDollar_contract_address);
   var redemptionFunctional = new web3js.eth.Contract(redemptionAbi,redemption_functional_address);
   var goodCoinMarket = new web3js.eth.Contract(gcmAbi,goodCoinMarketAddress);
-  var actions = new Actions(web3js,goodCoinMarket);
-  /*redemptionFunctional.events.ClaimCalculated()
-  .on('data', function(event){
+  var actions = undefined;
+  var eventSubscriber = new EventSubscriber(web3js,goodCoinMarket,contract);
   
-    console.log(event); // same results as the optional callback above
-})
-.on('changed', function(event){
-    // remove event from local database
-})
-.on('error', console.error);*/
-  /*
-  goodCoinMarket.events.allEvents({
+  let initializeActions = async function(){
     
-  }, function(error, event){ 
-    alert("event raised");
-    if (error!=undefined)
-      console.error(error);
-    else
-      console.log(event);
-   })
-  .on('data', function(event){
-      console.log(event); // same results as the optional callback above
-  })
-  .on('changed', function(event){
-      // remove event from local database
-  })
-  .on('error', console.error);
-  
-*/
+    let tokenDecimals =  await contract.methods.decimals().call();
+     var actions = new Actions(web3js,goodCoinMarket,tokenDecimals);
+     return actions;
+  }
   web3js.eth.getTransactionReceiptMined = function getTransactionReceiptMined(txHash, interval) {
       const self = this;
       const transactionReceiptAsync = function(resolve, reject) {
@@ -180,13 +162,14 @@ function startApp(web3js) {
   let getBalance = function(account) {
     return new Promise(function(resolve, reject) {
       contract.methods.balanceOf(account).call(
+        {'from':account},
         function (err, res) {
           if (err) {
             console.error(err);
             reject(err);
           }
           else {
-            resolve(web3js.utils.fromWei(res));
+            resolve(actions.fromGDUnits(res,'0'));
           }
       });
     }).catch(console.log)
@@ -306,23 +289,24 @@ function startApp(web3js) {
     console.log(`amount: ${amount}`);
     goodCoinMarket.methods.calculateAmountPurchased(
         amount).call(
+          {'from':ehteriumAccounts[0]},
         function(err, tokens){
-          tokens = web3js.utils.fromWei(tokens, 'ether');
-          console.log(`tokens before: ${tokens}`);
+          //tokens = web3js.utils.fromWei(tokens, 'ether')*(10**14);
+          tokens = actions.fromGDUnits(tokens,'0');
           console.log(`tokens: ${tokens}`);
-          $('#buy_price').text(parseFloat(tokens).toPrecision(7));
+          $('#buy_price').text(parseFloat(tokens).toPrecision(4));
         }
       );
   });
 
   $('.check-price-sell').on('click', function() {
     let amount = $('.sell-amount').val();
-    amount = web3js.utils.toWei(amount, "ether");
+    amount = actions.toGDUnits(amount, '0');
 
     goodCoinMarket.methods.calculatePriceForSale(
-      amount).call(
+      amount).call({'from':ehteriumAccounts[0]},
       function(err, tokens){
-        tokens = web3js.utils.fromWei(tokens, 'ether');
+        tokens = web3js.utils.fromWei(tokens, "ether");
         console.log(`tokens: ${tokens}`);
         $('#sell_price').text(parseFloat(tokens).toPrecision(7));
       }
@@ -331,30 +315,55 @@ function startApp(web3js) {
 
   $('.buy').on('click', function() {
     let amount = $('.buy-amount').val();
-    amount = web3js.toWei(amount, "ether");
-
-    goodCoinMarket.methods.buy().call(
+    amount = web3js.utils.toWei(amount, "ether");
+ 
+    goodCoinMarket.methods.buy().send(
       {
         'from':ehteriumAccounts[0],
         'value': amount
       },
-      function(err, transactionHash){
-        console.log(err,transactionHash);
+      function(err, isTxSuccess){
+        if (err) {
+          return console.error(err);;
+        }
+        else {
+          console.log("Transaction to"+ehteriumAccounts[0]+" succeeded?"+isTxSuccess);
+          updateMyBalance();
+          }
+        
       }
     );});
 
 
   $('.sell').on('click', function() {
     let amount = $('.sell-amount').val();
-    amount = web3js.utils.toWei(amount, "ether");
+    amount = actions.toGDUnits(amount, '0');
     goodCoinMarket.methods.sell(
-      amount).call(
+      amount).send(
       {'from':ehteriumAccounts[0]},
-      function(err, transactionHash){
-        console.log(err,transactionHash);
+      function(err, isTxSuccess){
+        if (err) {
+          return console.error(err);;
+        }
+        else {
+          console.log("Transaction to"+ehteriumAccounts[0]+" succeeded?"+isTxSuccess);
+          updateMyBalance();
+          }
+        
       }
     );
   });
+
+  let promiseActions = initializeActions();
+  promiseActions.then(function(result){
+    actions = result;
+  });
+
+
+  eventSubscriber.subscribe(contract, "Mint");
+  eventSubscriber.subscribe(contract, "MintFinished");
+  //eventSubscriber.subscribe(contract, "Burn");
+  eventSubscriber.subscribe(contract, "Mint");
   
   updateMyBalance();
   updateMyEntitlement();
