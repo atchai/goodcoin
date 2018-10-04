@@ -59,8 +59,11 @@ contract GoodCoinMarket is Ownable {
         require(msg.value > 0);
         uint256 tokensToMint = formula.calculatePurchaseReturn(
             totalSupply(),
+
             // the function is payable. Means the money sent was *already reflected* in the poolBalance! (eth)
             // But the user requested to buy according to the amount of poolBalance before he/she made the payment and changeed the formula
+             //when purchasing with eth the poolbalance is changed before this calculation
+
             //so we have to consider this
             poolBalance()-msg.value,
             reserveRatio,

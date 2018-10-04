@@ -29,7 +29,6 @@ module.exports = function(deployer,network,accounts) {
         
         // Minting X number of GoodCoins to the GoodCoin market.
         (await GoodCoin.deployed()).initialMove(GoodCoinMarket.address); 
-        
         totalSupply = (await goodCoin.totalSupply.call()).toString(10);
         console.log("After initialMove() - GoodCoin totalSupply:",totalSupply);
 
