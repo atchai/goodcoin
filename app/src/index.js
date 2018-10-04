@@ -301,12 +301,12 @@ window.addEventListener('load', function() {
 
   $('.check-price-sell').on('click', function() {
     let amount = $('.sell-amount').val();
-    amount = web3js.utils.toWei(amount, "ether");
+    amount = actions.toGDUnits(amount, '0');
 
     goodCoinMarket.methods.calculatePriceForSale(
       amount).call({'from':ehteriumAccounts[0]},
       function(err, tokens){
-        tokens = web3js.utils.fromWei(tokens, 'ether');
+        tokens = web3js.utils.fromWei(tokens, "ether");
         console.log(`tokens: ${tokens}`);
         $('#sell_price').text(parseFloat(tokens).toPrecision(7));
       }
@@ -337,12 +337,19 @@ window.addEventListener('load', function() {
 
   $('.sell').on('click', function() {
     let amount = $('.sell-amount').val();
-    amount = web3js.utils.toWei(amount, "ether");
+    amount = actions.toGDUnits(amount, '0');
     goodCoinMarket.methods.sell(
       amount).send(
       {'from':ehteriumAccounts[0]},
-      function(err, transactionHash){
-        console.log(err,transactionHash);
+      function(err, isTxSuccess){
+        if (err) {
+          return console.error(err);;
+        }
+        else {
+          console.log("Transaction to"+ehteriumAccounts[0]+" succeeded?"+isTxSuccess);
+          updateMyBalance();
+          }
+        
       }
     );
   });
@@ -352,7 +359,11 @@ window.addEventListener('load', function() {
     actions = result;
   });
 
-  eventSubscriber.subscribe(contract,"Mint");
+
+  eventSubscriber.subscribe(contract, "Mint");
+  eventSubscriber.subscribe(contract, "MintFinished");
+  //eventSubscriber.subscribe(contract, "Burn");
+  eventSubscriber.subscribe(contract, "Mint");
   
   updateMyBalance();
   updateMyEntitlement();
