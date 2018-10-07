@@ -1,5 +1,5 @@
 import Web3 from 'web3'
-import GoodCoinUtils from './GoodCoinUtils'
+import GoodDollarUtils from './GoodDollarUtils'
 import AccountsAndContracts from '../Model/AccountsAndContracts'
 
 class Actions {
@@ -25,7 +25,7 @@ class Actions {
 
     let bindedDecimalsCallBack = function (err, res) {
       this.tokenDecimals = res;
-      this.goodCoinUtils = new GoodCoinUtils(this.web3js, this.goodCoinMarket, this.tokenDecimals);
+      this.GoodDollarUtils = new GoodDollarUtils(this.web3js, this.goodCoinMarket, this.tokenDecimals);
     };
 
     this.contract.methods.decimals().call({}, bindedDecimalsCallBack.bind(this));
@@ -43,7 +43,7 @@ class Actions {
 	amount = this.web3js.utils.toWei(amount, "ether");
 	console.log(`Buy amount in Wei: ${amount}`);
 	let goodCoinMarket = this.goodCoinMarket;
-	let goodCoinUtils = this.goodCoinUtils;
+	let GoodDollarUtils = this.GoodDollarUtils;
 	let accountsAndContracts = this.accountsAndContracts;
 	let web3js = this.web3js;
  
@@ -64,10 +64,10 @@ class Actions {
  } 
  
   sell(amount) {
-	amount = this.goodCoinUtils.toGDUnits(amount, '0');
+	amount = this.GoodDollarUtils.toGDUnits(amount, '0');
 	console.log(`Sell amount in Wei: ${amount}`);
 	let goodCoinMarket = this.goodCoinMarket;
-	let goodCoinUtils = this.goodCoinUtils;
+	let GoodDollarUtils = this.GoodDollarUtils;
 	let accountsAndContracts = this.accountsAndContracts;
 	let web3js = this.web3js;
  
@@ -87,10 +87,10 @@ class Actions {
  }
 
   checkPriceSell(amount) {
-   amount = this.goodCoinUtils.toGDUnits(amount, '0');
+   amount = this.GoodDollarUtils.toGDUnits(amount, '0');
    console.log(`checkPriceSell amount in Wei: ${amount}`);
    let goodCoinMarket = this.goodCoinMarket;
-   let goodCoinUtils = this.goodCoinUtils;
+   let GoodDollarUtils = this.GoodDollarUtils;
    let accountsAndContracts = this.accountsAndContracts;
    let web3js = this.web3js;
 
@@ -114,7 +114,7 @@ class Actions {
     amount = this.web3js.utils.toWei(amount, "ether");
    console.log(`checkPriceBuy amount in Wei: ${amount}`);
    let goodCoinMarket = this.goodCoinMarket;
-   let goodCoinUtils = this.goodCoinUtils;
+   let GoodDollarUtils = this.GoodDollarUtils;
    let accountsAndContracts = this.accountsAndContracts;
 
    return new Promise (function (resolve, reject) {
@@ -126,7 +126,7 @@ class Actions {
             reject(err);
         } 
         else {
-          let result = goodCoinUtils.fromGDUnits(res, '0');
+          let result = GoodDollarUtils.fromGDUnits(res, '0');
           resolve(result);
         }
       });
@@ -147,7 +147,7 @@ class Actions {
 
   getBalance(account) {
     let contract = this.contract;
-    let goodCoinUtils = this.goodCoinUtils;
+    let GoodDollarUtils = this.GoodDollarUtils;
     
 
     return new Promise(function (resolve, reject) {
@@ -159,7 +159,7 @@ class Actions {
             reject(err);
           }
           else {
-            let result = goodCoinUtils.fromGDUnits(res, '0');
+            let result = GoodDollarUtils.fromGDUnits(res, '0');
             resolve(result);
           }
         });

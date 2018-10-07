@@ -6,7 +6,6 @@ import $ from 'jquery';
 import Actions from './Utils/Actions'
 import EventSubscriber from './Utils/EventSubscriber'
 import Logger from './Utils/Logger'
-import GoodCoinUtils from './Utils/GoodCoinUtils'
 
 const abi = require('./abi.js');
 const gcmAbi = require('./gcm_abi.js');
